@@ -1,26 +1,42 @@
 import express from 'express'
-import { JobRoutes } from '../modules/job/job.routes'
-import { LocationRoutes } from '../modules/location/location.route'
-import { ApplicationRoutes } from '../modules/application/application.routes'
-import { UserRoutes } from '../modules/clientRegistration/user.route'
+import AuthRoutes from '../modules/auth/auth.route'
+import UserRoutes from '../modules/user/user.route'
+import RoleRoutes from '../modules/role/role.route'
+import PermissionRoutes from '../modules/permission/permission.route'
+import ProductRoutes from '../modules/product/product.route'
+import SaleRoutes from '../modules/sale/sale.route'
+import DashboardRoutes from '../modules/dashboard/dashboard.route'
+
 const router = express.Router()
 
 const moduleRoutes = [
   {
     path: '/auth',
+    route: AuthRoutes,
+  },
+  {
+    path: '/users',
     route: UserRoutes,
   },
   {
-    path: '/jobs',
-    route: JobRoutes,
+    path: '/roles',
+    route: RoleRoutes,
   },
   {
-    path: '/locations',
-    route: LocationRoutes,
+    path: '/permissions',
+    route: PermissionRoutes,
   },
   {
-    path: '/applications',
-    route: ApplicationRoutes,
+    path: '/products',
+    route: ProductRoutes,
+  },
+  {
+    path: '/sales',
+    route: SaleRoutes,
+  },
+  {
+    path: '/dashboard',
+    route: DashboardRoutes,
   },
 ]
 

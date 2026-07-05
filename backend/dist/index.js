@@ -11,6 +11,7 @@ const http_1 = __importDefault(require("http"));
 const http_status_1 = __importDefault(require("http-status"));
 const index_1 = __importDefault(require("./app/routes/index"));
 const globalErrorHandler_1 = __importDefault(require("./errors/globalErrorHandler"));
+const multer_1 = require("./app/middlewares/multer");
 const dbConnect_1 = require("./helpers/dbConnect");
 const app = (0, express_1.default)();
 exports.app = app;
@@ -19,7 +20,12 @@ exports.server = server;
 // ============================
 // Allowed Origins
 // ============================
-const allowedOrigins = ['http://localhost:8080', 'http://localhost:3000'];
+const allowedOrigins = [
+    'http://localhost:8080',
+    'http://localhost:3000',
+    'https://quick-hire-2wzg.vercel.app',
+    'https://quick-hire-xrjd.vercel.app',
+];
 // ============================
 // Middleware
 // ============================
@@ -47,6 +53,10 @@ app.get('/', (req, res) => {
     res.status(http_status_1.default.BAD_REQUEST).send('Bad Request!');
 });
 app.use('/api/v1', index_1.default);
+// ============================
+// Multer Error Handling
+// ============================
+app.use(multer_1.handleMulterError);
 // ============================
 // Error Handling
 // ============================

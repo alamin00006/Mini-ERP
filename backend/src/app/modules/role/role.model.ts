@@ -1,6 +1,5 @@
-import { Schema, model, Model, Types } from 'mongoose';
+import { Schema, model, Model } from 'mongoose';
 import { IRole } from './role.interface';
-import { IPermission } from '../permission/permission.interface';
 
 const roleSchema = new Schema<IRole>(
   {
@@ -10,19 +9,21 @@ const roleSchema = new Schema<IRole>(
       unique: true,
       trim: true,
     },
-    permissions: {
-      type: [{ type: Schema.Types.ObjectId, ref: 'Permission' }],
-      required: true,
+    description: {
+      type: String,
+      trim: true,
     },
-    isActive: {
+    isSystem: {
       type: Boolean,
-      default: true,
+      default: false,
     },
   },
   {
     timestamps: true,
   }
 );
+
+roleSchema.index({ name: 1 });
 
 const Role: Model<IRole> = model<IRole>('Role', roleSchema);
 

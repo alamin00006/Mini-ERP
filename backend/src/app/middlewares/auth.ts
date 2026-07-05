@@ -3,47 +3,99 @@ import jwt, { JwtPayload } from 'jsonwebtoken'
 import { NextFunction, Request, Response } from 'express'
 import ApiError from '../../errors/ApiError'
 import config from '../../config'
+import User from '../../app/modules/user/user.model'
+import Role from '../../app/modules/role/role.model'
+import Permission from '../../app/modules/permission/permission.model'
+import UserRole from '../../app/modules/userRole/userRole.model'
+import RolePermission from '../../app/modules/rolePermission/rolePermission.model'
 
-const auth =
-  (...requiredRoles: string[]) =>
-  (req: Request, res: Response, next: NextFunction) => {
+export const auth = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const authHeader = req.headers.authorization
+    if (!authHeader) {
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'You are not authorized')
+    }
+
+    const token = authHeader.startsWith('Bearer ')
+      ? authHeader.split(' ')[1]
+      : authHeader
+
+    if (!config.jwt.secret) {
+      throw new ApiError(
+        httpStatus.INTERNAL_SERVER_ERROR,
+        'JWT secret is not configured',
+      )
+    }
+
+    const decoded = jwt.verify(token, config.jwt.secret) as JwtPayload
+
+    const user = await User.findById(decoded.userId)
+    if (!user) {
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'User not found')
+    }
+
+    const userRole = await UserRole.findOne({ user: user._id }).populate('role')
+    if (!userRole) {
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'User role not found')
+    }
+
+    const role = userRole.role as any
+    const rolePermissions = await RolePermission.find({
+      role: role._id,
+    }).populate('permission')
+
+    const permissions = rolePermissions
+      .filter((rp: any) => rp.permission && rp.allowed)
+      .map((rp: any) => (rp.permission as any).key)
+
+    req.user = {
+      userId: user._id.toString(),
+      roleId: role._id.toString(),
+      roleName: role.name,
+      permissions,
+    }
+
+    next()
+  } catch (err) {
+    if (err instanceof ApiError) {
+      next(err)
+    } else {
+      next(new ApiError(httpStatus.UNAUTHORIZED, 'Invalid or expired token'))
+    }
+  }
+}
+
+export const authorize = (...requiredPermissions: string[]) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     try {
-      // 1. Get token
-      const authHeader = req.headers.authorization
-      // console.log(authHeader)
-      if (!authHeader) {
+      const user = req.user as any
+
+      if (!user) {
         throw new ApiError(httpStatus.UNAUTHORIZED, 'You are not authorized')
       }
 
-      // If token comes as "Bearer token"
-      const token = authHeader.startsWith('Bearer ')
-        ? authHeader.split(' ')[1]
-        : authHeader
+      if (user.roleName === 'Admin') {
+        return next()
+      }
 
-      // 2. Verify token
-      const decoded = jwt.verify(
-        token,
-        config.jwt.secret as string,
-      ) as JwtPayload
+      const hasPermission = requiredPermissions.some(permission =>
+        user.permissions.includes(permission),
+      )
 
-      // 3. Attach user to request
-      req.user = decoded
-
-      // 4. Check roles (if any required)
-      if (requiredRoles.length > 0) {
-        if (!decoded.role || !requiredRoles.includes(decoded.role)) {
-          throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden')
-        }
+      if (!hasPermission) {
+        throw new ApiError(
+          httpStatus.FORBIDDEN,
+          'You do not have permission to access this resource',
+        )
       }
 
       next()
     } catch (err) {
-      next(
-        err instanceof ApiError
-          ? err
-          : new ApiError(httpStatus.UNAUTHORIZED, 'Invalid or expired token'),
-      )
+      next(err)
     }
   }
-
-export default auth
+}

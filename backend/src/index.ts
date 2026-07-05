@@ -5,6 +5,7 @@ import http from 'http'
 import httpStatus from 'http-status'
 import routes from './app/routes/index'
 import globalErrorHandler from './errors/globalErrorHandler'
+import { handleMulterError } from './app/middlewares/multer'
 
 import { databaseConnect } from './helpers/dbConnect'
 
@@ -14,12 +15,7 @@ const server = http.createServer(app)
 // ============================
 // Allowed Origins
 // ============================
-const allowedOrigins = [
-  'http://localhost:8080',
-  'http://localhost:3000',
-  'https://quick-hire-2wzg.vercel.app',
-  'https://quick-hire-xrjd.vercel.app',
-]
+const allowedOrigins = ['http://localhost:8080', 'http://localhost:3000']
 
 // ============================
 // Middleware
@@ -52,6 +48,11 @@ app.get('/', (req, res) => {
 })
 
 app.use('/api/v1', routes)
+
+// ============================
+// Multer Error Handling
+// ============================
+app.use(handleMulterError)
 
 // ============================
 // Error Handling

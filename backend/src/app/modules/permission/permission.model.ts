@@ -3,26 +3,41 @@ import { IPermission } from './permission.interface';
 
 const permissionSchema = new Schema<IPermission>(
   {
-    name: {
+    key: {
       type: String,
       required: true,
       unique: true,
       trim: true,
     },
-    resource: {
+    name: {
       type: String,
       required: true,
       trim: true,
     },
-    isActive: {
+    description: {
+      type: String,
+      trim: true,
+    },
+    group: {
+      type: String,
+      trim: true,
+    },
+    module: {
+      type: String,
+      trim: true,
+    },
+    isSystem: {
       type: Boolean,
-      default: true,
+      default: false,
     },
   },
   {
     timestamps: true,
   }
 );
+
+permissionSchema.index({ key: 1 });
+permissionSchema.index({ group: 1 });
 
 const Permission: Model<IPermission> = model<IPermission>('Permission', permissionSchema);
 

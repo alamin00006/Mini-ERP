@@ -1,10 +1,9 @@
-import { Document, Types } from 'mongoose';
-import { IPermission } from '../permission/permission.interface';
+import { Document } from 'mongoose';
 
 export interface IRole extends Document {
   name: string;
-  permissions: Types.ObjectId[] | IPermission[];
-  isActive: boolean;
+  description?: string;
+  isSystem: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

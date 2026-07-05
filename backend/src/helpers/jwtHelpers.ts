@@ -2,7 +2,13 @@ import jwt, { Secret, SignOptions } from 'jsonwebtoken'
 import httpStatus from 'http-status'
 import ApiError from '../errors/ApiError'
 import config from '../config'
-import { IJwtPayload } from '../app/modules/clientRegistration/user.interface'
+
+interface IJwtPayload {
+  userId: string
+  roleId: string
+  roleName: string
+  permissions: string[]
+}
 
 const generateToken = (payload: IJwtPayload): string => {
   try {

@@ -1,6 +1,5 @@
-import { Schema, model, Model, Types } from 'mongoose';
+import { Schema, model, Model } from 'mongoose';
 import { IUser } from './user.interface';
-import { IRole } from '../role/role.interface';
 
 const userSchema = new Schema<IUser>(
   {
@@ -20,11 +19,6 @@ const userSchema = new Schema<IUser>(
       type: String,
       required: true,
       select: false,
-    },
-    role: {
-      type: Schema.Types.ObjectId,
-      ref: 'Role',
-      required: true,
     },
     isActive: {
       type: Boolean,
