@@ -3,6 +3,12 @@ import httpStatus from 'http-status'
 import sendResponse from '../../../shared/sendResponse'
 import { AuthService } from './auth.service'
 
+/**
+ * Handles user login authentication
+ * @param req - Express request object containing user credentials
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const loginUser = async (
   req: Request,
   res: Response,

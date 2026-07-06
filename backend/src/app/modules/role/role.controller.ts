@@ -3,6 +3,12 @@ import httpStatus from 'http-status'
 import sendResponse from '../../../shared/sendResponse'
 import { RoleService } from './role.service'
 
+/**
+ * Creates a new role
+ * @param req - Express request object containing role data
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const createRole = async (
   req: Request,
   res: Response,
@@ -21,6 +27,12 @@ const createRole = async (
   }
 }
 
+/**
+ * Retrieves all roles
+ * @param req - Express request object
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const getAllRoles = async (
   req: Request,
   res: Response,
@@ -39,6 +51,12 @@ const getAllRoles = async (
   }
 }
 
+/**
+ * Retrieves a role by ID
+ * @param req - Express request object with role ID in params
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const getRoleById = async (
   req: Request,
   res: Response,
@@ -58,6 +76,12 @@ const getRoleById = async (
   }
 }
 
+/**
+ * Updates a role by ID
+ * @param req - Express request object with role ID in params and update data in body
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const updateRole = async (
   req: Request,
   res: Response,
@@ -77,6 +101,12 @@ const updateRole = async (
   }
 }
 
+/**
+ * Deactivates a role by ID
+ * @param req - Express request object with role ID in params
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const deactivateRole = async (
   req: Request,
   res: Response,

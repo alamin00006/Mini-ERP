@@ -3,6 +3,9 @@ import ApiError from '../../../errors/ApiError'
 import Permission from './permission.model'
 import RolePermission from '../rolePermission/rolePermission.model'
 
+/**
+ * Response type for permission operations
+ */
 type TPermissionResponse = {
   _id: string
   key: string
@@ -15,6 +18,11 @@ type TPermissionResponse = {
   updatedAt: Date
 }
 
+/**
+ * Creates a new permission
+ * @param payload - Permission creation data (key, name, description, group, module)
+ * @returns Promise<TPermissionResponse> - Created permission data
+ */
 const createPermission = async (payload: {
   key: string
   name: string
@@ -54,6 +62,10 @@ const createPermission = async (payload: {
   }
 }
 
+/**
+ * Retrieves all permissions sorted by module, group, and key
+ * @returns Promise<TPermissionResponse[]> - Array of all permissions
+ */
 const getAllPermissions = async (): Promise<TPermissionResponse[]> => {
   const permissions = await Permission.find().sort({
     module: 1,
@@ -74,6 +86,11 @@ const getAllPermissions = async (): Promise<TPermissionResponse[]> => {
   }))
 }
 
+/**
+ * Retrieves a permission by ID
+ * @param id - Permission ID
+ * @returns Promise<TPermissionResponse> - Permission data
+ */
 const getPermissionById = async (id: string): Promise<TPermissionResponse> => {
   const permission = await Permission.findById(id)
 
@@ -94,6 +111,12 @@ const getPermissionById = async (id: string): Promise<TPermissionResponse> => {
   }
 }
 
+/**
+ * Updates a permission by ID
+ * @param id - Permission ID to update
+ * @param payload - Partial permission data to update
+ * @returns Promise<TPermissionResponse> - Updated permission data
+ */
 const updatePermission = async (
   id: string,
   payload: Partial<{
@@ -136,6 +159,11 @@ const updatePermission = async (
   }
 }
 
+/**
+ * Deletes a permission by ID
+ * @param id - Permission ID to delete
+ * @throws Error if permission is assigned to one or more roles
+ */
 const deletePermission = async (id: string): Promise<void> => {
   const permission = await Permission.findById(id)
   if (!permission) {

@@ -6,16 +6,6 @@ import handleValidationError from './handleValidationError'
 import handleCastError from './handleCastError'
 import handleDuplicateError from './handleDuplicateError'
 import config from '../config'
-// import { errorLogger } from '../config/logger'
-
-// const sanitizeBody = (body: any) => {
-//   const sensitiveFields = ['password', 'token']
-//   const sanitized = { ...body }
-//   sensitiveFields.forEach(field => {
-//     if (sanitized[field]) sanitized[field] = '[REDACTED]'
-//   })
-//   return sanitized
-// }
 
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next): void => {
   // Default values
@@ -37,20 +27,6 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next): void => {
     if (err instanceof Error) return 'GenericError'
     return 'UnknownError'
   })()
-
-  // Log the error
-  // errorLogger.error({
-  //   message: err.message || 'An error occurred',
-  //   stack: err.stack,
-  //   statusCode,
-  //   errorSources,
-  //   errorType,
-  //   request: {
-  //     method: req.method,
-  //     url: req.originalUrl,
-  //     body: sanitizeBody(req.body),
-  //   },
-  // })
 
   // Handle errors using switch
   switch (errorType) {

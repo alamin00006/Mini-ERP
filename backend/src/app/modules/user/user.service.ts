@@ -5,6 +5,9 @@ import User from './user.model'
 import UserRole from '../userRole/userRole.model'
 import Role from '../role/role.model'
 
+/**
+ * Response type for user operations
+ */
 type TUserResponse = {
   _id: string
   name: string
@@ -15,6 +18,11 @@ type TUserResponse = {
   updatedAt: Date
 }
 
+/**
+ * Creates a new user with hashed password and assigned role
+ * @param payload - User creation data (name, email, password, role)
+ * @returns Promise<TUserResponse> - Created user data
+ */
 const createUser = async (payload: {
   name: string
   email: string
@@ -67,6 +75,10 @@ const createUser = async (payload: {
   }
 }
 
+/**
+ * Retrieves all users with their roles
+ * @returns Promise<TUserResponse[]> - Array of all users
+ */
 const getAllUsers = async (): Promise<TUserResponse[]> => {
   const users = await User.find().populate({
     path: 'userRoles',
@@ -89,6 +101,11 @@ const getAllUsers = async (): Promise<TUserResponse[]> => {
   })
 }
 
+/**
+ * Retrieves a user by ID with populated role
+ * @param id - User ID
+ * @returns Promise<TUserResponse> - User data
+ */
 const getUserById = async (id: string): Promise<TUserResponse> => {
   const user = await User.findById(id).populate({
     path: 'userRoles',
@@ -114,6 +131,12 @@ const getUserById = async (id: string): Promise<TUserResponse> => {
   }
 }
 
+/**
+ * Updates a user by ID
+ * @param id - User ID to update
+ * @param payload - Partial user data to update
+ * @returns Promise<TUserResponse> - Updated user data
+ */
 const updateUser = async (
   id: string,
   payload: Partial<{
@@ -169,6 +192,11 @@ const updateUser = async (
   }
 }
 
+/**
+ * Deactivates a user by ID (soft delete)
+ * @param id - User ID to deactivate
+ * @returns Promise<TUserResponse> - Deactivated user data
+ */
 const deactivateUser = async (id: string): Promise<TUserResponse> => {
   const user = await User.findById(id)
   if (!user) {

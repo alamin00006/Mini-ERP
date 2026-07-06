@@ -4,6 +4,9 @@ import mongoose from 'mongoose'
 import Product from '../product/product.model'
 import Sale from './sale.model'
 
+/**
+ * Product details in a sale
+ */
 type TSaleProduct = {
   product: string
   quantity: number
@@ -11,6 +14,9 @@ type TSaleProduct = {
   subtotal: number
 }
 
+/**
+ * Response type for sale operations
+ */
 type TSaleResponse = {
   _id: string
   products: TSaleProduct[]
@@ -20,6 +26,12 @@ type TSaleResponse = {
   updatedAt: Date
 }
 
+/**
+ * Creates a new sale transaction with stock management
+ * Uses MongoDB transaction to ensure data consistency
+ * @param payload - Sale creation data (products array and createdBy user ID)
+ * @returns Promise<TSaleResponse> - Created sale data
+ */
 const createSale = async (payload: {
   products: { product: string; quantity: number }[]
   createdBy: string

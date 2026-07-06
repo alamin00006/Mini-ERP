@@ -7,9 +7,7 @@ const validateRequest =
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       // Validate the request
-      await schema.parseAsync({
-        body: req.body,
-      })
+      await schema.parseAsync(req.body)
       next()
     } catch (err: any) {
       if (err?.issues) {

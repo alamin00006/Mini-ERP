@@ -4,6 +4,9 @@ import Role from './role.model'
 import Permission from '../permission/permission.model'
 import RolePermission from '../rolePermission/rolePermission.model'
 
+/**
+ * Response type for role operations
+ */
 type TRoleResponse = {
   _id: string
   name: string
@@ -14,6 +17,11 @@ type TRoleResponse = {
   updatedAt: Date
 }
 
+/**
+ * Creates a new role with optional permissions
+ * @param payload - Role creation data (name, description, permissions)
+ * @returns Promise<TRoleResponse> - Created role data with permissions
+ */
 const createRole = async (payload: {
   name: string
   description?: string
@@ -70,6 +78,10 @@ const createRole = async (payload: {
   }
 }
 
+/**
+ * Retrieves all roles with their permissions
+ * @returns Promise<TRoleResponse[]> - Array of all roles
+ */
 const getAllRoles = async (): Promise<TRoleResponse[]> => {
   const roles = await Role.find().populate({
     path: 'rolePermissions',
@@ -96,6 +108,11 @@ const getAllRoles = async (): Promise<TRoleResponse[]> => {
   })
 }
 
+/**
+ * Retrieves a role by ID with populated permissions
+ * @param id - Role ID
+ * @returns Promise<TRoleResponse> - Role data with permissions
+ */
 const getRoleById = async (id: string): Promise<TRoleResponse> => {
   const role = await Role.findById(id).populate({
     path: 'rolePermissions',
@@ -124,6 +141,12 @@ const getRoleById = async (id: string): Promise<TRoleResponse> => {
   }
 }
 
+/**
+ * Updates a role by ID
+ * @param id - Role ID to update
+ * @param payload - Partial role data to update (name, description, permissions)
+ * @returns Promise<TRoleResponse> - Updated role data
+ */
 const updateRole = async (
   id: string,
   payload: Partial<{
@@ -188,6 +211,11 @@ const updateRole = async (
   }
 }
 
+/**
+ * Deactivates a role by ID (soft delete)
+ * @param id - Role ID to deactivate
+ * @returns Promise<TRoleResponse> - Deactivated role data
+ */
 const deactivateRole = async (id: string): Promise<TRoleResponse> => {
   const role = await Role.findById(id)
   if (!role) {

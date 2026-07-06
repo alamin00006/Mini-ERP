@@ -8,6 +8,9 @@ import UserRole from '../userRole/userRole.model'
 import Role from '../role/role.model'
 import RolePermission from '../rolePermission/rolePermission.model'
 
+/**
+ * Response type for user login
+ */
 type TLoginResponse = {
   accessToken: string
   refreshToken?: string
@@ -20,6 +23,11 @@ type TLoginResponse = {
   }
 }
 
+/**
+ * Authenticates user and generates access token
+ * @param payload - User login credentials (email and password)
+ * @returns Promise<TLoginResponse> - Access token and user information with permissions
+ */
 const loginUser = async (payload: {
   email: string
   password: string

@@ -1,10 +1,14 @@
 import httpStatus from 'http-status'
 import ApiError from '../../../errors/ApiError'
 import { uploadToR2, deleteFromR2 } from '../../../helpers/r2Upload'
+import { generateSKU } from '../../../utils'
 import Product from './product.model'
 import Category from '../category/category.model'
 import type { Multer } from 'multer'
 
+/**
+ * Response type for product operations
+ */
 type TProductResponse = {
   _id: string
   name: string
@@ -19,26 +23,11 @@ type TProductResponse = {
   updatedAt: Date
 }
 
-const generateSKU = async (): Promise<string> => {
-  const lastProduct = await Product.findOne().sort({ createdAt: -1 })
-  const prefix = 'PRD'
-
-  if (!lastProduct) {
-    return `${prefix}-000001`
-  }
-
-  const lastSKU = lastProduct.sku
-  const match = lastSKU.match(/^PRD-(\d+)$/)
-
-  if (match) {
-    const lastNumber = parseInt(match[1], 10)
-    const nextNumber = lastNumber + 1
-    return `${prefix}-${String(nextNumber).padStart(6, '0')}`
-  }
-
-  return `${prefix}-000001`
-}
-
+/**
+ * Creates a new product with image upload to R2
+ * @param payload - Product creation data (name, sku, category, purchasePrice, sellingPrice, stockQuantity, image)
+ * @returns Promise<TProductResponse> - Created product data
+ */
 const createProduct = async (payload: {
   name: string
   sku?: string
@@ -104,6 +93,11 @@ const createProduct = async (payload: {
   }
 }
 
+/**
+ * Retrieves all products with pagination, search, and filtering
+ * @param query - Query parameters (page, limit, search, sortBy, sortOrder, category)
+ * @returns Promise<{ data: TProductResponse[]; meta: any }> - Products data with pagination meta
+ */
 const getAllProducts = async (query: {
   page?: number
   limit?: number
@@ -171,6 +165,11 @@ const getAllProducts = async (query: {
   }
 }
 
+/**
+ * Retrieves a product by ID
+ * @param id - Product ID
+ * @returns Promise<TProductResponse> - Product data
+ */
 const getProductById = async (id: string): Promise<TProductResponse> => {
   const product = await Product.findOne({ _id: id, isDeleted: false }).populate(
     'category',
@@ -195,6 +194,13 @@ const getProductById = async (id: string): Promise<TProductResponse> => {
   }
 }
 
+/**
+ * Updates a product by ID with optional image upload
+ * @param id - Product ID to update
+ * @param payload - Partial product data to update
+ * @param image - Optional new image file to upload
+ * @returns Promise<TProductResponse> - Updated product data
+ */
 const updateProduct = async (
   id: string,
   payload: Partial<{
@@ -264,6 +270,10 @@ const updateProduct = async (
   }
 }
 
+/**
+ * Deletes a product by ID (soft delete)
+ * @param id - Product ID to delete
+ */
 const deleteProduct = async (id: string): Promise<void> => {
   const product = await Product.findById(id)
   if (!product) {

@@ -3,6 +3,12 @@ import httpStatus from 'http-status'
 import sendResponse from '../../../shared/sendResponse'
 import { PermissionService } from './permission.service'
 
+/**
+ * Creates a new permission
+ * @param req - Express request object containing permission data
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const createPermission = async (
   req: Request,
   res: Response,
@@ -21,6 +27,12 @@ const createPermission = async (
   }
 }
 
+/**
+ * Retrieves all permissions
+ * @param req - Express request object
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const getAllPermissions = async (
   req: Request,
   res: Response,
@@ -39,6 +51,12 @@ const getAllPermissions = async (
   }
 }
 
+/**
+ * Retrieves a permission by ID
+ * @param req - Express request object with permission ID in params
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const getPermissionById = async (
   req: Request,
   res: Response,
@@ -58,6 +76,12 @@ const getPermissionById = async (
   }
 }
 
+/**
+ * Updates a permission by ID
+ * @param req - Express request object with permission ID in params and update data in body
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const updatePermission = async (
   req: Request,
   res: Response,
@@ -77,6 +101,12 @@ const updatePermission = async (
   }
 }
 
+/**
+ * Deletes a permission by ID
+ * @param req - Express request object with permission ID in params
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const deletePermission = async (
   req: Request,
   res: Response,

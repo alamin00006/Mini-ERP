@@ -3,6 +3,12 @@ import httpStatus from 'http-status'
 import sendResponse from '../../../shared/sendResponse'
 import { SaleService } from './sale.service'
 
+/**
+ * Creates a new sale transaction
+ * @param req - Express request object containing sale data and user info from auth middleware
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const createSale = async (
   req: Request,
   res: Response,
