@@ -8,6 +8,7 @@ const auth_route_1 = __importDefault(require("../modules/auth/auth.route"));
 const user_route_1 = __importDefault(require("../modules/user/user.route"));
 const role_route_1 = __importDefault(require("../modules/role/role.route"));
 const permission_route_1 = __importDefault(require("../modules/permission/permission.route"));
+const category_route_1 = __importDefault(require("../modules/category/category.route"));
 const product_route_1 = __importDefault(require("../modules/product/product.route"));
 const sale_route_1 = __importDefault(require("../modules/sale/sale.route"));
 const dashboard_route_1 = __importDefault(require("../modules/dashboard/dashboard.route"));
@@ -28,6 +29,10 @@ const moduleRoutes = [
     {
         path: '/permissions',
         route: permission_route_1.default,
+    },
+    {
+        path: '/categories',
+        route: category_route_1.default,
     },
     {
         path: '/products',

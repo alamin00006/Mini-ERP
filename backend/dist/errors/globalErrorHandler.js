@@ -8,15 +8,6 @@ const handleValidationError_1 = __importDefault(require("./handleValidationError
 const handleCastError_1 = __importDefault(require("./handleCastError"));
 const handleDuplicateError_1 = __importDefault(require("./handleDuplicateError"));
 const config_1 = __importDefault(require("../config"));
-// import { errorLogger } from '../config/logger'
-// const sanitizeBody = (body: any) => {
-//   const sensitiveFields = ['password', 'token']
-//   const sanitized = { ...body }
-//   sensitiveFields.forEach(field => {
-//     if (sanitized[field]) sanitized[field] = '[REDACTED]'
-//   })
-//   return sanitized
-// }
 const globalErrorHandler = (err, req, res, next) => {
     // Default values
     let statusCode = 500;
@@ -41,19 +32,6 @@ const globalErrorHandler = (err, req, res, next) => {
             return 'GenericError';
         return 'UnknownError';
     })();
-    // Log the error
-    // errorLogger.error({
-    //   message: err.message || 'An error occurred',
-    //   stack: err.stack,
-    //   statusCode,
-    //   errorSources,
-    //   errorType,
-    //   request: {
-    //     method: req.method,
-    //     url: req.originalUrl,
-    //     body: sanitizeBody(req.body),
-    //   },
-    // })
     // Handle errors using switch
     switch (errorType) {
         case 'ValidationError':

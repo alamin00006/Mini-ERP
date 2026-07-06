@@ -16,27 +16,18 @@ exports.ProductService = void 0;
 const http_status_1 = __importDefault(require("http-status"));
 const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const r2Upload_1 = require("../../../helpers/r2Upload");
+const utils_1 = require("../../../utils");
 const product_model_1 = __importDefault(require("./product.model"));
 const category_model_1 = __importDefault(require("../category/category.model"));
-const generateSKU = () => __awaiter(void 0, void 0, void 0, function* () {
-    const lastProduct = yield product_model_1.default.findOne().sort({ createdAt: -1 });
-    const prefix = 'PRD';
-    if (!lastProduct) {
-        return `${prefix}-000001`;
-    }
-    const lastSKU = lastProduct.sku;
-    const match = lastSKU.match(/^PRD-(\d+)$/);
-    if (match) {
-        const lastNumber = parseInt(match[1], 10);
-        const nextNumber = lastNumber + 1;
-        return `${prefix}-${String(nextNumber).padStart(6, '0')}`;
-    }
-    return `${prefix}-000001`;
-});
+/**
+ * Creates a new product with image upload to R2
+ * @param payload - Product creation data (name, sku, category, purchasePrice, sellingPrice, stockQuantity, image)
+ * @returns Promise<TProductResponse> - Created product data
+ */
 const createProduct = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const { name, sku, category, purchasePrice, sellingPrice, stockQuantity, image, } = payload;
-    const finalSKU = sku || (yield generateSKU());
+    const finalSKU = sku || (yield (0, utils_1.generateSKU)());
     const existingProduct = yield product_model_1.default.findOne({ sku: finalSKU });
     if (existingProduct) {
         throw new ApiError_1.default(http_status_1.default.CONFLICT, 'Product with this SKU already exists');
@@ -70,6 +61,11 @@ const createProduct = (payload) => __awaiter(void 0, void 0, void 0, function* (
         updatedAt: product.updatedAt,
     };
 });
+/**
+ * Retrieves all products with pagination, search, and filtering
+ * @param query - Query parameters (page, limit, search, sortBy, sortOrder, category)
+ * @returns Promise<{ data: TProductResponse[]; meta: any }> - Products data with pagination meta
+ */
 const getAllProducts = (query) => __awaiter(void 0, void 0, void 0, function* () {
     const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'desc', category, } = query;
     const productQuery = { isDeleted: false };
@@ -120,6 +116,11 @@ const getAllProducts = (query) => __awaiter(void 0, void 0, void 0, function* ()
         },
     };
 });
+/**
+ * Retrieves a product by ID
+ * @param id - Product ID
+ * @returns Promise<TProductResponse> - Product data
+ */
 const getProductById = (id) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const product = yield product_model_1.default.findOne({ _id: id, isDeleted: false }).populate('category');
@@ -140,6 +141,13 @@ const getProductById = (id) => __awaiter(void 0, void 0, void 0, function* () {
         updatedAt: product.updatedAt,
     };
 });
+/**
+ * Updates a product by ID with optional image upload
+ * @param id - Product ID to update
+ * @param payload - Partial product data to update
+ * @param image - Optional new image file to upload
+ * @returns Promise<TProductResponse> - Updated product data
+ */
 const updateProduct = (id, payload, image) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const product = yield product_model_1.default.findById(id);
@@ -184,6 +192,10 @@ const updateProduct = (id, payload, image) => __awaiter(void 0, void 0, void 0, 
         updatedAt: updatedProduct.updatedAt,
     };
 });
+/**
+ * Deletes a product by ID (soft delete)
+ * @param id - Product ID to delete
+ */
 const deleteProduct = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const product = yield product_model_1.default.findById(id);
     if (!product) {

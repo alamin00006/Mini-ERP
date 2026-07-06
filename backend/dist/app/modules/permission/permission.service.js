@@ -17,6 +17,11 @@ const http_status_1 = __importDefault(require("http-status"));
 const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const permission_model_1 = __importDefault(require("./permission.model"));
 const rolePermission_model_1 = __importDefault(require("../rolePermission/rolePermission.model"));
+/**
+ * Creates a new permission
+ * @param payload - Permission creation data (key, name, description, group, module)
+ * @returns Promise<TPermissionResponse> - Created permission data
+ */
 const createPermission = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const { key, name, description, group, module } = payload;
     const existingPermission = yield permission_model_1.default.findOne({ key });
@@ -43,6 +48,10 @@ const createPermission = (payload) => __awaiter(void 0, void 0, void 0, function
         updatedAt: permission.updatedAt,
     };
 });
+/**
+ * Retrieves all permissions sorted by module, group, and key
+ * @returns Promise<TPermissionResponse[]> - Array of all permissions
+ */
 const getAllPermissions = () => __awaiter(void 0, void 0, void 0, function* () {
     const permissions = yield permission_model_1.default.find().sort({
         module: 1,
@@ -61,6 +70,11 @@ const getAllPermissions = () => __awaiter(void 0, void 0, void 0, function* () {
         updatedAt: permission.updatedAt,
     }));
 });
+/**
+ * Retrieves a permission by ID
+ * @param id - Permission ID
+ * @returns Promise<TPermissionResponse> - Permission data
+ */
 const getPermissionById = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const permission = yield permission_model_1.default.findById(id);
     if (!permission) {
@@ -78,6 +92,12 @@ const getPermissionById = (id) => __awaiter(void 0, void 0, void 0, function* ()
         updatedAt: permission.updatedAt,
     };
 });
+/**
+ * Updates a permission by ID
+ * @param id - Permission ID to update
+ * @param payload - Partial permission data to update
+ * @returns Promise<TPermissionResponse> - Updated permission data
+ */
 const updatePermission = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
     const permission = yield permission_model_1.default.findById(id);
     if (!permission) {
@@ -104,6 +124,11 @@ const updatePermission = (id, payload) => __awaiter(void 0, void 0, void 0, func
         updatedAt: updatedPermission.updatedAt,
     };
 });
+/**
+ * Deletes a permission by ID
+ * @param id - Permission ID to delete
+ * @throws Error if permission is assigned to one or more roles
+ */
 const deletePermission = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const permission = yield permission_model_1.default.findById(id);
     if (!permission) {

@@ -16,6 +16,12 @@ exports.UserController = void 0;
 const http_status_1 = __importDefault(require("http-status"));
 const sendResponse_1 = __importDefault(require("../../../shared/sendResponse"));
 const user_service_1 = require("./user.service");
+/**
+ * Creates a new user
+ * @param req - Express request object containing user data
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const createUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield user_service_1.UserService.createUser(req.body);
@@ -30,6 +36,12 @@ const createUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         next(error);
     }
 });
+/**
+ * Retrieves all users
+ * @param req - Express request object
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const getAllUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield user_service_1.UserService.getAllUsers();
@@ -44,6 +56,12 @@ const getAllUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         next(error);
     }
 });
+/**
+ * Retrieves a user by ID
+ * @param req - Express request object with user ID in params
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const getUserById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
@@ -59,6 +77,12 @@ const getUserById = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         next(error);
     }
 });
+/**
+ * Updates a user by ID
+ * @param req - Express request object with user ID in params and update data in body
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
@@ -74,6 +98,12 @@ const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         next(error);
     }
 });
+/**
+ * Deactivates a user by ID
+ * @param req - Express request object with user ID in params
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const deactivateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;

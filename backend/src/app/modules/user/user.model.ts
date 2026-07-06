@@ -1,5 +1,5 @@
-import { Schema, model, Model } from 'mongoose';
-import { IUser } from './user.interface';
+import { Schema, model, Model } from 'mongoose'
+import { IUser } from './user.interface'
 
 const userSchema = new Schema<IUser>(
   {
@@ -27,9 +27,16 @@ const userSchema = new Schema<IUser>(
   },
   {
     timestamps: true,
-  }
-);
+  },
+)
 
-const User: Model<IUser> = model<IUser>('User', userSchema);
+// Virtual populate for userRoles
+userSchema.virtual('userRoles', {
+  ref: 'UserRole',
+  localField: '_id',
+  foreignField: 'user',
+})
 
-export default User;
+const User: Model<IUser> = model<IUser>('User', userSchema)
+
+export default User

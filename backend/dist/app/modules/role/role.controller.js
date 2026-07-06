@@ -16,6 +16,12 @@ exports.RoleController = void 0;
 const http_status_1 = __importDefault(require("http-status"));
 const sendResponse_1 = __importDefault(require("../../../shared/sendResponse"));
 const role_service_1 = require("./role.service");
+/**
+ * Creates a new role
+ * @param req - Express request object containing role data
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const createRole = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield role_service_1.RoleService.createRole(req.body);
@@ -30,6 +36,12 @@ const createRole = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         next(error);
     }
 });
+/**
+ * Retrieves all roles
+ * @param req - Express request object
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const getAllRoles = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield role_service_1.RoleService.getAllRoles();
@@ -44,6 +56,12 @@ const getAllRoles = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         next(error);
     }
 });
+/**
+ * Retrieves a role by ID
+ * @param req - Express request object with role ID in params
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const getRoleById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
@@ -59,6 +77,12 @@ const getRoleById = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         next(error);
     }
 });
+/**
+ * Updates a role by ID
+ * @param req - Express request object with role ID in params and update data in body
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const updateRole = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
@@ -74,6 +98,12 @@ const updateRole = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         next(error);
     }
 });
+/**
+ * Deactivates a role by ID
+ * @param req - Express request object with role ID in params
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const deactivateRole = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;

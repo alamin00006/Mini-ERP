@@ -16,6 +16,12 @@ exports.SaleController = void 0;
 const http_status_1 = __importDefault(require("http-status"));
 const sendResponse_1 = __importDefault(require("../../../shared/sendResponse"));
 const sale_service_1 = require("./sale.service");
+/**
+ * Creates a new sale transaction
+ * @param req - Express request object containing sale data and user info from auth middleware
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const createSale = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {

@@ -3,6 +3,7 @@ import AuthRoutes from '../modules/auth/auth.route'
 import UserRoutes from '../modules/user/user.route'
 import RoleRoutes from '../modules/role/role.route'
 import PermissionRoutes from '../modules/permission/permission.route'
+import CategoryRoutes from '../modules/category/category.route'
 import ProductRoutes from '../modules/product/product.route'
 import SaleRoutes from '../modules/sale/sale.route'
 import DashboardRoutes from '../modules/dashboard/dashboard.route'
@@ -25,6 +26,10 @@ const moduleRoutes = [
   {
     path: '/permissions',
     route: PermissionRoutes,
+  },
+  {
+    path: '/categories',
+    route: CategoryRoutes,
   },
   {
     path: '/products',

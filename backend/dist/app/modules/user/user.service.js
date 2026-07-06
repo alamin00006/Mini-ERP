@@ -19,6 +19,11 @@ const passwordHelpers_1 = require("../../../helpers/passwordHelpers");
 const user_model_1 = __importDefault(require("./user.model"));
 const userRole_model_1 = __importDefault(require("../userRole/userRole.model"));
 const role_model_1 = __importDefault(require("../role/role.model"));
+/**
+ * Creates a new user with hashed password and assigned role
+ * @param payload - User creation data (name, email, password, role)
+ * @returns Promise<TUserResponse> - Created user data
+ */
 const createUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, email, password, role } = payload;
     const existingUser = yield user_model_1.default.findOne({ email });
@@ -55,6 +60,10 @@ const createUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
         updatedAt: user.updatedAt,
     };
 });
+/**
+ * Retrieves all users with their roles
+ * @returns Promise<TUserResponse[]> - Array of all users
+ */
 const getAllUsers = () => __awaiter(void 0, void 0, void 0, function* () {
     const users = yield user_model_1.default.find().populate({
         path: 'userRoles',
@@ -76,6 +85,11 @@ const getAllUsers = () => __awaiter(void 0, void 0, void 0, function* () {
         };
     });
 });
+/**
+ * Retrieves a user by ID with populated role
+ * @param id - User ID
+ * @returns Promise<TUserResponse> - User data
+ */
 const getUserById = (id) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     const user = yield user_model_1.default.findById(id).populate({
@@ -98,6 +112,12 @@ const getUserById = (id) => __awaiter(void 0, void 0, void 0, function* () {
         updatedAt: user.updatedAt,
     };
 });
+/**
+ * Updates a user by ID
+ * @param id - User ID to update
+ * @param payload - Partial user data to update
+ * @returns Promise<TUserResponse> - Updated user data
+ */
 const updateUser = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const user = yield user_model_1.default.findById(id);
@@ -131,6 +151,11 @@ const updateUser = (id, payload) => __awaiter(void 0, void 0, void 0, function* 
         updatedAt: updatedUser.updatedAt,
     };
 });
+/**
+ * Deactivates a user by ID (soft delete)
+ * @param id - User ID to deactivate
+ * @returns Promise<TUserResponse> - Deactivated user data
+ */
 const deactivateUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const user = yield user_model_1.default.findById(id);

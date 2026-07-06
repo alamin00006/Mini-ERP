@@ -23,6 +23,13 @@ const roleSchema = new Schema<IRole>(
   },
 )
 
+// Virtual populate for rolePermissions
+roleSchema.virtual('rolePermissions', {
+  ref: 'RolePermission',
+  localField: '_id',
+  foreignField: 'role',
+})
+
 const Role: Model<IRole> = model<IRole>('Role', roleSchema)
 
 export default Role

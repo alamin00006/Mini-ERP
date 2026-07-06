@@ -12,25 +12,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DashboardService = void 0;
-const product_model_1 = __importDefault(require("../product/product.model"));
-const sale_model_1 = __importDefault(require("../sale/sale.model"));
+exports.generateSKU = void 0;
+const product_model_1 = __importDefault(require("../app/modules/product/product.model"));
 /**
- * Retrieves dashboard statistics
- * @returns Promise<TDashboardStats> - Dashboard stats (total products, total sales, low stock products)
+ * Generates a unique SKU (Stock Keeping Unit) for products
+ * Format: PRD-000001, PRD-000002, etc.
+ * @returns Promise<string> - Generated SKU
  */
-const getDashboardStats = () => __awaiter(void 0, void 0, void 0, function* () {
-    const [totalProducts, totalSales, lowStockProducts] = yield Promise.all([
-        product_model_1.default.countDocuments({ isDeleted: false }),
-        sale_model_1.default.countDocuments(),
-        product_model_1.default.countDocuments({ isDeleted: false, stockQuantity: { $lt: 5 } }),
-    ]);
-    return {
-        totalProducts,
-        totalSales,
-        lowStockProducts,
-    };
+const generateSKU = () => __awaiter(void 0, void 0, void 0, function* () {
+    const lastProduct = yield product_model_1.default.findOne().sort({ createdAt: -1 });
+    const prefix = 'PRD';
+    if (!lastProduct) {
+        return `${prefix}-000001`;
+    }
+    const lastSKU = lastProduct.sku;
+    const match = lastSKU.match(/^PRD-(\d+)$/);
+    if (match) {
+        const lastNumber = parseInt(match[1], 10);
+        const nextNumber = lastNumber + 1;
+        return `${prefix}-${String(nextNumber).padStart(6, '0')}`;
+    }
+    return `${prefix}-000001`;
 });
-exports.DashboardService = {
-    getDashboardStats,
-};
+exports.generateSKU = generateSKU;

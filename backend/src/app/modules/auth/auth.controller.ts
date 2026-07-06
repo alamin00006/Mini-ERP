@@ -15,6 +15,7 @@ const loginUser = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
+    console.log(req.body)
     const result = await AuthService.loginUser(req.body)
     sendResponse(res, {
       statusCode: httpStatus.OK,

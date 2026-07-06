@@ -144,6 +144,36 @@ const defaultPermissions = [
     module: 'Product',
   },
 
+  // Category permissions
+  {
+    key: 'category.create',
+    name: 'Create Category',
+    description: 'Create new category',
+    group: 'Category',
+    module: 'Category',
+  },
+  {
+    key: 'category.read',
+    name: 'Read Category',
+    description: 'View categories',
+    group: 'Category',
+    module: 'Category',
+  },
+  {
+    key: 'category.update',
+    name: 'Update Category',
+    description: 'Update category',
+    group: 'Category',
+    module: 'Category',
+  },
+  {
+    key: 'category.delete',
+    name: 'Delete Category',
+    description: 'Delete category',
+    group: 'Category',
+    module: 'Category',
+  },
+
   // Sale permissions
   {
     key: 'sale.create',
@@ -183,6 +213,9 @@ const defaultRoles = [
       'product.create',
       'product.read',
       'product.update',
+      'category.create',
+      'category.read',
+      'category.update',
       'sale.create',
       'sale.read',
       'dashboard.read',
@@ -192,7 +225,12 @@ const defaultRoles = [
   {
     name: 'Employee',
     description: 'Employee with basic access',
-    permissions: ['product.read', 'sale.create', 'dashboard.read'],
+    permissions: [
+      'product.read',
+      'category.read',
+      'sale.create',
+      'dashboard.read',
+    ],
   },
 ]
 

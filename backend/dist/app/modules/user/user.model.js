@@ -26,5 +26,11 @@ const userSchema = new mongoose_1.Schema({
 }, {
     timestamps: true,
 });
+// Virtual populate for userRoles
+userSchema.virtual('userRoles', {
+    ref: 'UserRole',
+    localField: '_id',
+    foreignField: 'user',
+});
 const User = (0, mongoose_1.model)('User', userSchema);
 exports.default = User;

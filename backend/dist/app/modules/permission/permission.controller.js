@@ -16,6 +16,12 @@ exports.PermissionController = void 0;
 const http_status_1 = __importDefault(require("http-status"));
 const sendResponse_1 = __importDefault(require("../../../shared/sendResponse"));
 const permission_service_1 = require("./permission.service");
+/**
+ * Creates a new permission
+ * @param req - Express request object containing permission data
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const createPermission = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield permission_service_1.PermissionService.createPermission(req.body);
@@ -30,6 +36,12 @@ const createPermission = (req, res, next) => __awaiter(void 0, void 0, void 0, f
         next(error);
     }
 });
+/**
+ * Retrieves all permissions
+ * @param req - Express request object
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const getAllPermissions = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield permission_service_1.PermissionService.getAllPermissions();
@@ -44,6 +56,12 @@ const getAllPermissions = (req, res, next) => __awaiter(void 0, void 0, void 0, 
         next(error);
     }
 });
+/**
+ * Retrieves a permission by ID
+ * @param req - Express request object with permission ID in params
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const getPermissionById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
@@ -59,6 +77,12 @@ const getPermissionById = (req, res, next) => __awaiter(void 0, void 0, void 0, 
         next(error);
     }
 });
+/**
+ * Updates a permission by ID
+ * @param req - Express request object with permission ID in params and update data in body
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const updatePermission = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
@@ -74,6 +98,12 @@ const updatePermission = (req, res, next) => __awaiter(void 0, void 0, void 0, f
         next(error);
     }
 });
+/**
+ * Deletes a permission by ID
+ * @param req - Express request object with permission ID in params
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
 const deletePermission = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;

@@ -12,28 +12,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProductController = void 0;
+exports.CategoryController = void 0;
 const http_status_1 = __importDefault(require("http-status"));
-const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const sendResponse_1 = __importDefault(require("../../../shared/sendResponse"));
-const product_service_1 = require("./product.service");
+const category_service_1 = require("./category.service");
 /**
- * Creates a new product with image upload
- * @param req - Express request object containing product data and image file
+ * Creates a new category
+ * @param req - Express request object containing category data
  * @param res - Express response object
  * @param next - Express next middleware function for error handling
  */
-const createProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const createCategory = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const file = req.file;
-        if (!file) {
-            throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Product image is required');
-        }
-        const result = yield product_service_1.ProductService.createProduct(Object.assign(Object.assign({}, req.body), { image: file }));
+        const result = yield category_service_1.CategoryService.createCategory(req.body);
         (0, sendResponse_1.default)(res, {
             statusCode: http_status_1.default.CREATED,
             success: true,
-            message: 'Product created successfully',
+            message: 'Category created successfully',
             data: result,
         });
     }
@@ -42,48 +37,18 @@ const createProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     }
 });
 /**
- * Retrieves all products with pagination, search, and filtering
- * @param req - Express request object with query parameters (page, limit, search, sortBy, sortOrder, category)
+ * Retrieves all categories
+ * @param req - Express request object
  * @param res - Express response object
  * @param next - Express next middleware function for error handling
  */
-const getAllProducts = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const getAllCategories = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { page, limit, search, sortBy, sortOrder, category } = req.query;
-        const result = yield product_service_1.ProductService.getAllProducts({
-            page: page ? parseInt(page) : undefined,
-            limit: limit ? parseInt(limit) : undefined,
-            search: search,
-            sortBy: sortBy,
-            sortOrder: sortOrder,
-            category: category,
-        });
+        const result = yield category_service_1.CategoryService.getAllCategories();
         (0, sendResponse_1.default)(res, {
             statusCode: http_status_1.default.OK,
             success: true,
-            message: 'Products retrieved successfully',
-            data: result.data,
-            meta: result.meta,
-        });
-    }
-    catch (error) {
-        next(error);
-    }
-});
-/**
- * Retrieves a product by ID
- * @param req - Express request object with product ID in params
- * @param res - Express response object
- * @param next - Express next middleware function for error handling
- */
-const getProductById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { id } = req.params;
-        const result = yield product_service_1.ProductService.getProductById(id);
-        (0, sendResponse_1.default)(res, {
-            statusCode: http_status_1.default.OK,
-            success: true,
-            message: 'Product retrieved successfully',
+            message: 'Categories retrieved successfully',
             data: result,
         });
     }
@@ -92,20 +57,19 @@ const getProductById = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
     }
 });
 /**
- * Updates a product by ID with optional image upload
- * @param req - Express request object with product ID in params, update data in body, and optional image file
+ * Retrieves a category by ID
+ * @param req - Express request object with category ID in params
  * @param res - Express response object
  * @param next - Express next middleware function for error handling
  */
-const updateProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const getCategoryById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const file = req.file;
-        const result = yield product_service_1.ProductService.updateProduct(id, req.body, file);
+        const result = yield category_service_1.CategoryService.getCategoryById(id);
         (0, sendResponse_1.default)(res, {
             statusCode: http_status_1.default.OK,
             success: true,
-            message: 'Product updated successfully',
+            message: 'Category retrieved successfully',
             data: result,
         });
     }
@@ -114,29 +78,50 @@ const updateProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     }
 });
 /**
- * Deletes a product by ID (soft delete)
- * @param req - Express request object with product ID in params
+ * Updates a category by ID
+ * @param req - Express request object with category ID in params and update data in body
  * @param res - Express response object
  * @param next - Express next middleware function for error handling
  */
-const deleteProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const updateCategory = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        yield product_service_1.ProductService.deleteProduct(id);
+        const result = yield category_service_1.CategoryService.updateCategory(id, req.body);
         (0, sendResponse_1.default)(res, {
             statusCode: http_status_1.default.OK,
             success: true,
-            message: 'Product deleted successfully',
+            message: 'Category updated successfully',
+            data: result,
         });
     }
     catch (error) {
         next(error);
     }
 });
-exports.ProductController = {
-    createProduct,
-    getAllProducts,
-    getProductById,
-    updateProduct,
-    deleteProduct,
+/**
+ * Deletes a category by ID (soft delete)
+ * @param req - Express request object with category ID in params
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
+const deleteCategory = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        yield category_service_1.CategoryService.deleteCategory(id);
+        (0, sendResponse_1.default)(res, {
+            statusCode: http_status_1.default.OK,
+            success: true,
+            message: 'Category deleted successfully',
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.CategoryController = {
+    createCategory,
+    getAllCategories,
+    getCategoryById,
+    updateCategory,
+    deleteCategory,
 };

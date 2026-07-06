@@ -16,9 +16,7 @@ const ApiError_1 = __importDefault(require("../../errors/ApiError"));
 const validateRequest = (schema) => (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Validate the request
-        yield schema.parseAsync({
-            body: req.body,
-        });
+        yield schema.parseAsync(req.body);
         next();
     }
     catch (err) {

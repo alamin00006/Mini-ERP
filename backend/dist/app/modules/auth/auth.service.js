@@ -20,6 +20,11 @@ const passwordHelpers_1 = require("../../../helpers/passwordHelpers");
 const user_model_1 = __importDefault(require("../user/user.model"));
 const userRole_model_1 = __importDefault(require("../userRole/userRole.model"));
 const rolePermission_model_1 = __importDefault(require("../rolePermission/rolePermission.model"));
+/**
+ * Authenticates user and generates access token
+ * @param payload - User login credentials (email and password)
+ * @returns Promise<TLoginResponse> - Access token and user information with permissions
+ */
 const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = payload;
     const user = yield user_model_1.default.findOne({ email }).select('+password');

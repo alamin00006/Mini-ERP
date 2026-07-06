@@ -18,6 +18,12 @@ const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const product_model_1 = __importDefault(require("../product/product.model"));
 const sale_model_1 = __importDefault(require("./sale.model"));
+/**
+ * Creates a new sale transaction with stock management
+ * Uses MongoDB transaction to ensure data consistency
+ * @param payload - Sale creation data (products array and createdBy user ID)
+ * @returns Promise<TSaleResponse> - Created sale data
+ */
 const createSale = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const { products, createdBy } = payload;
     if (!products || products.length === 0) {
