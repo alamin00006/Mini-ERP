@@ -19,9 +19,29 @@ type TProductResponse = {
   updatedAt: Date
 }
 
+const generateSKU = async (): Promise<string> => {
+  const lastProduct = await Product.findOne().sort({ createdAt: -1 })
+  const prefix = 'PRD'
+
+  if (!lastProduct) {
+    return `${prefix}-000001`
+  }
+
+  const lastSKU = lastProduct.sku
+  const match = lastSKU.match(/^PRD-(\d+)$/)
+
+  if (match) {
+    const lastNumber = parseInt(match[1], 10)
+    const nextNumber = lastNumber + 1
+    return `${prefix}-${String(nextNumber).padStart(6, '0')}`
+  }
+
+  return `${prefix}-000001`
+}
+
 const createProduct = async (payload: {
   name: string
-  sku: string
+  sku?: string
   category: string
   purchasePrice: number
   sellingPrice: number
@@ -38,7 +58,9 @@ const createProduct = async (payload: {
     image,
   } = payload
 
-  const existingProduct = await Product.findOne({ sku })
+  const finalSKU = sku || (await generateSKU())
+
+  const existingProduct = await Product.findOne({ sku: finalSKU })
   if (existingProduct) {
     throw new ApiError(
       httpStatus.CONFLICT,
@@ -55,7 +77,7 @@ const createProduct = async (payload: {
 
   const product = await Product.create({
     name,
-    sku,
+    sku: finalSKU,
     category,
     purchasePrice,
     sellingPrice,

@@ -1,5 +1,5 @@
-import { Schema, model, Model } from 'mongoose';
-import { IPermission } from './permission.interface';
+import { Schema, model, Model } from 'mongoose'
+import { IPermission } from './permission.interface'
 
 const permissionSchema = new Schema<IPermission>(
   {
@@ -33,12 +33,14 @@ const permissionSchema = new Schema<IPermission>(
   },
   {
     timestamps: true,
-  }
-);
+  },
+)
 
-permissionSchema.index({ key: 1 });
-permissionSchema.index({ group: 1 });
+permissionSchema.index({ group: 1 })
 
-const Permission: Model<IPermission> = model<IPermission>('Permission', permissionSchema);
+const Permission: Model<IPermission> = model<IPermission>(
+  'Permission',
+  permissionSchema,
+)
 
-export default Permission;
+export default Permission

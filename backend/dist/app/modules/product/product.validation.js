@@ -4,7 +4,7 @@ exports.updateProductValidation = exports.createProductValidation = void 0;
 const zod_1 = require("zod");
 exports.createProductValidation = zod_1.z.object({
     name: zod_1.z.string().min(2, 'Name must be at least 2 characters'),
-    sku: zod_1.z.string().min(2, 'SKU must be at least 2 characters'),
+    sku: zod_1.z.string().optional(),
     category: zod_1.z.string().min(1, 'Category is required'),
     purchasePrice: zod_1.z
         .number()

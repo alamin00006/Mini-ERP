@@ -54,13 +54,8 @@ app.use('/api/v1', routes)
 // ============================
 app.use(handleMulterError)
 
-// ============================
-// Error Handling
-// ============================
-app.use(globalErrorHandler)
-
 // 404 Handler
-app.use((req, res, next) => {
+app.use((req, res) => {
   res.status(httpStatus.NOT_FOUND).json({
     success: false,
     message: 'Not Found',
@@ -71,8 +66,12 @@ app.use((req, res, next) => {
       },
     ],
   })
-  next()
 })
+
+// ============================
+// Error Handling
+// ============================
+app.use(globalErrorHandler)
 
 // ============================
 // Process Error Handling

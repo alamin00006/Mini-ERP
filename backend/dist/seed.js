@@ -221,23 +221,22 @@ const seedDB = () => __awaiter(void 0, void 0, void 0, function* () {
             throw new Error('MONGO_URI not defined');
         yield mongoose_1.default.connect(mongoUri);
         console.log('MongoDB Connected for seeding');
-        // Clear old data
-        yield user_model_1.default.deleteMany({});
-        yield role_model_1.default.deleteMany({});
-        yield permission_model_1.default.deleteMany({});
-        yield userRole_model_1.default.deleteMany({});
-        yield rolePermission_model_1.default.deleteMany({});
-        yield category_model_1.default.deleteMany({});
-        console.log('Cleared existing data');
-        // Create permissions
-        const createdPermissions = yield permission_model_1.default.insertMany(defaultPermissions);
-        console.log(`Seeded ${createdPermissions.length} permissions`);
-        // Create permission map
+        // Seed permissions (idempotent)
+        console.log('Seeding permissions...');
+        for (const permissionData of defaultPermissions) {
+            yield permission_model_1.default.findOneAndUpdate({ key: permissionData.key }, permissionData, { upsert: true, new: true });
+        }
+        console.log(`Seeded ${defaultPermissions.length} permissions`);
+        // Get all permissions
+        const createdPermissions = yield permission_model_1.default.find();
         const permissionMap = new Map(createdPermissions.map(p => [p.key, p._id]));
-        // Create roles
+        // Seed roles (idempotent)
+        console.log('Seeding roles...');
         for (const roleData of defaultRoles) {
             const { permissions } = roleData, roleInfo = __rest(roleData, ["permissions"]);
-            const role = yield role_model_1.default.create(roleInfo);
+            const role = yield role_model_1.default.findOneAndUpdate({ name: roleInfo.name }, roleInfo, { upsert: true, new: true });
+            // Clear existing permissions for this role
+            yield rolePermission_model_1.default.deleteMany({ role: role._id });
             // Assign permissions to role
             const rolePermissions = permissions
                 .filter((key) => permissionMap.has(key))
@@ -247,29 +246,31 @@ const seedDB = () => __awaiter(void 0, void 0, void 0, function* () {
                 allowed: true,
             }));
             yield rolePermission_model_1.default.insertMany(rolePermissions);
-            console.log(`Created role: ${role.name} with ${rolePermissions.length} permissions`);
+            console.log(`Created/Updated role: ${role.name} with ${rolePermissions.length} permissions`);
         }
-        // Create default admin user
+        // Create default admin user (idempotent)
         const adminRole = yield role_model_1.default.findOne({ name: 'Admin' });
         if (adminRole) {
             const hashedPassword = yield (0, passwordHelpers_1.hashPassword)('admin123');
-            const adminUser = yield user_model_1.default.create({
+            const adminUser = yield user_model_1.default.findOneAndUpdate({ email: 'admin@example.com' }, {
                 name: 'Admin User',
                 email: 'admin@example.com',
                 password: hashedPassword,
                 isActive: true,
-            });
-            yield userRole_model_1.default.create({
-                user: adminUser._id,
-                role: adminRole._id,
-            });
-            console.log('Created default admin user: admin@example.com / admin123');
+            }, { upsert: true, new: true });
+            // Ensure admin user has Admin role
+            yield userRole_model_1.default.findOneAndUpdate({ user: adminUser._id }, { user: adminUser._id, role: adminRole._id }, { upsert: true });
+            console.log('Created/Updated admin user: admin@example.com / admin123');
         }
-        // Create default categories
-        yield category_model_1.default.insertMany(defaultCategories);
+        // Seed categories (idempotent)
+        console.log('Seeding categories...');
+        for (const categoryData of defaultCategories) {
+            yield category_model_1.default.findOneAndUpdate({ name: categoryData.name }, categoryData, { upsert: true, new: true });
+        }
         console.log(`Seeded ${defaultCategories.length} categories`);
         yield mongoose_1.default.connection.close();
         console.log('Database connection closed');
+        console.log('✅ Seeding completed successfully!');
         process.exit(0);
     }
     catch (error) {

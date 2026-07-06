@@ -209,26 +209,33 @@ const seedDB = async (): Promise<void> => {
     await mongoose.connect(mongoUri)
     console.log('MongoDB Connected for seeding')
 
-    // Clear old data
-    await User.deleteMany({})
-    await Role.deleteMany({})
-    await Permission.deleteMany({})
-    await UserRole.deleteMany({})
-    await RolePermission.deleteMany({})
-    await Category.deleteMany({})
-    console.log('Cleared existing data')
+    // Seed permissions (idempotent)
+    console.log('Seeding permissions...')
+    for (const permissionData of defaultPermissions) {
+      await Permission.findOneAndUpdate(
+        { key: permissionData.key },
+        permissionData,
+        { upsert: true, new: true },
+      )
+    }
+    console.log(`Seeded ${defaultPermissions.length} permissions`)
 
-    // Create permissions
-    const createdPermissions = await Permission.insertMany(defaultPermissions)
-    console.log(`Seeded ${createdPermissions.length} permissions`)
-
-    // Create permission map
+    // Get all permissions
+    const createdPermissions = await Permission.find()
     const permissionMap = new Map(createdPermissions.map(p => [p.key, p._id]))
 
-    // Create roles
+    // Seed roles (idempotent)
+    console.log('Seeding roles...')
     for (const roleData of defaultRoles) {
       const { permissions, ...roleInfo } = roleData
-      const role = await Role.create(roleInfo)
+      const role = await Role.findOneAndUpdate(
+        { name: roleInfo.name },
+        roleInfo,
+        { upsert: true, new: true },
+      )
+
+      // Clear existing permissions for this role
+      await RolePermission.deleteMany({ role: role._id })
 
       // Assign permissions to role
       const rolePermissions = permissions
@@ -241,35 +248,49 @@ const seedDB = async (): Promise<void> => {
 
       await RolePermission.insertMany(rolePermissions)
       console.log(
-        `Created role: ${role.name} with ${rolePermissions.length} permissions`,
+        `Created/Updated role: ${role.name} with ${rolePermissions.length} permissions`,
       )
     }
 
-    // Create default admin user
+    // Create default admin user (idempotent)
     const adminRole = await Role.findOne({ name: 'Admin' })
     if (adminRole) {
       const hashedPassword = await hashPassword('admin123')
-      const adminUser = await User.create({
-        name: 'Admin User',
-        email: 'admin@example.com',
-        password: hashedPassword,
-        isActive: true,
-      })
+      const adminUser = await User.findOneAndUpdate(
+        { email: 'admin@example.com' },
+        {
+          name: 'Admin User',
+          email: 'admin@example.com',
+          password: hashedPassword,
+          isActive: true,
+        },
+        { upsert: true, new: true },
+      )
 
-      await UserRole.create({
-        user: adminUser._id,
-        role: adminRole._id,
-      })
+      // Ensure admin user has Admin role
+      await UserRole.findOneAndUpdate(
+        { user: adminUser._id },
+        { user: adminUser._id, role: adminRole._id },
+        { upsert: true },
+      )
 
-      console.log('Created default admin user: admin@example.com / admin123')
+      console.log('Created/Updated admin user: admin@example.com / admin123')
     }
 
-    // Create default categories
-    await Category.insertMany(defaultCategories)
+    // Seed categories (idempotent)
+    console.log('Seeding categories...')
+    for (const categoryData of defaultCategories) {
+      await Category.findOneAndUpdate(
+        { name: categoryData.name },
+        categoryData,
+        { upsert: true, new: true },
+      )
+    }
     console.log(`Seeded ${defaultCategories.length} categories`)
 
     await mongoose.connection.close()
     console.log('Database connection closed')
+    console.log('✅ Seeding completed successfully!')
     process.exit(0)
   } catch (error: any) {
     console.error('Seeding error:', error.message)

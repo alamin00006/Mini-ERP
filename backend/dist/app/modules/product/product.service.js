@@ -18,10 +18,26 @@ const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const r2Upload_1 = require("../../../helpers/r2Upload");
 const product_model_1 = __importDefault(require("./product.model"));
 const category_model_1 = __importDefault(require("../category/category.model"));
+const generateSKU = () => __awaiter(void 0, void 0, void 0, function* () {
+    const lastProduct = yield product_model_1.default.findOne().sort({ createdAt: -1 });
+    const prefix = 'PRD';
+    if (!lastProduct) {
+        return `${prefix}-000001`;
+    }
+    const lastSKU = lastProduct.sku;
+    const match = lastSKU.match(/^PRD-(\d+)$/);
+    if (match) {
+        const lastNumber = parseInt(match[1], 10);
+        const nextNumber = lastNumber + 1;
+        return `${prefix}-${String(nextNumber).padStart(6, '0')}`;
+    }
+    return `${prefix}-000001`;
+});
 const createProduct = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const { name, sku, category, purchasePrice, sellingPrice, stockQuantity, image, } = payload;
-    const existingProduct = yield product_model_1.default.findOne({ sku });
+    const finalSKU = sku || (yield generateSKU());
+    const existingProduct = yield product_model_1.default.findOne({ sku: finalSKU });
     if (existingProduct) {
         throw new ApiError_1.default(http_status_1.default.CONFLICT, 'Product with this SKU already exists');
     }
@@ -32,7 +48,7 @@ const createProduct = (payload) => __awaiter(void 0, void 0, void 0, function* (
     const imageUrl = yield (0, r2Upload_1.uploadToR2)(image, 'products');
     const product = yield product_model_1.default.create({
         name,
-        sku,
+        sku: finalSKU,
         category,
         purchasePrice,
         sellingPrice,

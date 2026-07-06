@@ -32,7 +32,6 @@ const permissionSchema = new mongoose_1.Schema({
 }, {
     timestamps: true,
 });
-permissionSchema.index({ key: 1 });
 permissionSchema.index({ group: 1 });
 const Permission = (0, mongoose_1.model)('Permission', permissionSchema);
 exports.default = Permission;

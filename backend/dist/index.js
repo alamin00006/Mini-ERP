@@ -20,12 +20,7 @@ exports.server = server;
 // ============================
 // Allowed Origins
 // ============================
-const allowedOrigins = [
-    'http://localhost:8080',
-    'http://localhost:3000',
-    'https://quick-hire-2wzg.vercel.app',
-    'https://quick-hire-xrjd.vercel.app',
-];
+const allowedOrigins = ['http://localhost:8080', 'http://localhost:3000'];
 // ============================
 // Middleware
 // ============================
@@ -57,12 +52,8 @@ app.use('/api/v1', index_1.default);
 // Multer Error Handling
 // ============================
 app.use(multer_1.handleMulterError);
-// ============================
-// Error Handling
-// ============================
-app.use(globalErrorHandler_1.default);
 // 404 Handler
-app.use((req, res, next) => {
+app.use((req, res) => {
     res.status(http_status_1.default.NOT_FOUND).json({
         success: false,
         message: 'Not Found',
@@ -73,8 +64,11 @@ app.use((req, res, next) => {
             },
         ],
     });
-    next();
 });
+// ============================
+// Error Handling
+// ============================
+app.use(globalErrorHandler_1.default);
 // ============================
 // Process Error Handling
 // ============================
