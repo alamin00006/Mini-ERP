@@ -15,7 +15,6 @@ import { DataTable, type Column } from "@/components/shared/DataTable";
 import { PermissionGuard } from "@/components/shared/PermissionGuard";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatusBadge } from "@/components/shared/StatusBadge";
-import { getErrorMessage } from "@/utils/getErrorMessage";
 
 import {
   useGetCategoriesQuery,

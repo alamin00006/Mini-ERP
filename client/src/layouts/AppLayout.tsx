@@ -239,9 +239,7 @@ const SidebarInner = ({
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground shadow-sm">
             E
           </span>
-          {!collapsed && (
-            <span className="text-base font-semibold tracking-tight">ERP Console</span>
-          )}
+          {!collapsed && <span className="text-base font-semibold tracking-tight">Mini ERP</span>}
         </div>
       </div>
 
