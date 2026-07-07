@@ -28,8 +28,8 @@ const CreateProductPage = () => {
     if (image) formData.append("image", image);
 
     try {
-      await createProduct(formData).unwrap();
-      toast.success("Product created successfully");
+      const result = await createProduct(formData).unwrap();
+      toast.success(result.data.message || "Product created successfully");
       navigate("/products");
     } catch (error: any) {
       toast.error(error.data.message || "Failed to create product");

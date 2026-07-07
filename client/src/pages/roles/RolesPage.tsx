@@ -57,13 +57,13 @@ const RolesPage = () => {
         await updateRole({ id: editingRole._id, data: formData }).unwrap();
         toast.success("Role updated successfully");
       } else {
-        await createRole(formData).unwrap();
-        toast.success("Role created successfully");
+        const result = await createRole(formData).unwrap();
+        toast.success(result.data.message || "Role created successfully");
       }
       setDialogOpen(false);
-    } catch (e) {
+    } catch (error: any) {
       toast.error(
-        getErrorMessage(e) || (editingRole ? "Failed to update role" : "Failed to create role"),
+        error.data?.message || (editingRole ? "Failed to update role" : "Failed to create role"),
       );
     }
   };

@@ -205,8 +205,8 @@ const CreateSalePage = () => {
       setItems([{ productId: "", quantity: "1" }]);
       // Refetch notifications to show the new sale notification
       refetchNotifications();
-    } catch {
-      toast.error("Failed to create sale");
+    } catch (error: any) {
+      toast.error(error.data?.message || "Failed to record sale");
     }
   };
 

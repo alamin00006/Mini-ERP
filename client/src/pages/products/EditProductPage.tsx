@@ -31,8 +31,8 @@ export default function EditProductPage() {
     if (image) formData.append("image", image);
 
     try {
-      await updateProduct({ id, form: formData }).unwrap();
-      toast.success("Product updated");
+      const result = await updateProduct({ id, form: formData }).unwrap();
+      toast.success(result.data.message || "Product updated successfully");
       navigate("/products");
     } catch (error: any) {
       toast.error(error.data.message || "Failed to update product");

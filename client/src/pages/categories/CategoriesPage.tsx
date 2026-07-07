@@ -70,9 +70,9 @@ const CategoriesPage = () => {
         toast.success("Category created successfully");
       }
       setDialogOpen(false);
-    } catch (e) {
+    } catch (error: any) {
       toast.error(
-        getErrorMessage(e) ||
+        error.data?.message ||
           (editingCategory ? "Failed to update category" : "Failed to create category"),
       );
     }

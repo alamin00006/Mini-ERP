@@ -115,9 +115,8 @@ const RBACPage = () => {
       }
       setRoleDialogOpen(false);
       refetchRoles();
-    } catch (e) {
-      const err = e as { data?: { message?: string } } | undefined;
-      toast.error(err?.data?.message || "Failed to save role");
+    } catch (error: any) {
+      toast.error(error.data?.message || "Failed to save role");
     }
   };
 
@@ -127,9 +126,8 @@ const RBACPage = () => {
       await deleteRole(id).unwrap();
       toast.success("Role deleted successfully");
       refetchRoles();
-    } catch (e) {
-      const err = e as { data?: { message?: string } } | undefined;
-      toast.error(err?.data?.message || "Failed to delete role");
+    } catch (error: any) {
+      toast.error(error.data?.message || "Failed to delete role");
     }
   };
 

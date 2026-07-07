@@ -66,8 +66,8 @@ const NotificationsPage = () => {
     try {
       await markAllAsRead().unwrap();
       toast.success("All notifications marked as read");
-    } catch (error) {
-      toast.error("Failed to mark all notifications as read");
+    } catch (error: any) {
+      toast.error(error.data?.message || "Failed to mark all notifications as read");
     }
   };
 

@@ -73,9 +73,9 @@ export default function PermissionsPage() {
         toast.success("Permission created successfully");
       }
       setDialogOpen(false);
-    } catch (e) {
+    } catch (error: any) {
       toast.error(
-        getErrorMessage(e) ||
+        error.data.message ||
           (editingPermission ? "Failed to update permission" : "Failed to create permission"),
       );
     }

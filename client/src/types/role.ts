@@ -1,4 +1,5 @@
 export interface Role {
+  data: any;
   _id: string | number;
   name: string;
   description?: string;
