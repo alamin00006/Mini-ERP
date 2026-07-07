@@ -32,6 +32,7 @@ import {
 
 import { useCreateSaleMutation, useGetProductsQuery, useGetNotificationsQuery } from "@/redux";
 import type { Product } from "@/types";
+import type { ApiError } from "@/types";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { SummaryCard } from "@/components/shared/SummaryCard";
@@ -206,7 +207,8 @@ const CreateSalePage = () => {
       // Refetch notifications to show the new sale notification
       refetchNotifications();
     } catch (error: any) {
-      toast.error(error.data?.message || "Failed to record sale");
+      const apiError: ApiError = error;
+      toast.error(apiError.data?.message || "Failed to record sale");
     }
   };
 

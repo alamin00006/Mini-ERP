@@ -6,6 +6,7 @@ import { useGetProductQuery, useUpdateProductMutation } from "@/redux";
 import { useAuth } from "@/hooks/useAuth";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { ProductFormValues } from "@/schemas/productSchema";
+import type { ApiError } from "@/types";
 
 export default function EditProductPage() {
   const { id = "" } = useParams<{ id: string }>();
@@ -35,7 +36,8 @@ export default function EditProductPage() {
       toast.success(result.data.message || "Product updated successfully");
       navigate("/products");
     } catch (error: any) {
-      toast.error(error.data.message || "Failed to update product");
+      const apiError: ApiError = error;
+      toast.error(apiError.data?.message || "Failed to update product");
     }
   };
 

@@ -15,7 +15,6 @@ import { DataTable, type Column } from "@/components/shared/DataTable";
 import { PermissionGuard } from "@/components/shared/PermissionGuard";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatusBadge } from "@/components/shared/StatusBadge";
-import { getErrorMessage } from "@/utils/getErrorMessage";
 
 // Update role references to match backend (capitalized)
 import {
@@ -25,6 +24,7 @@ import {
   useDeleteRoleMutation,
 } from "@/redux";
 import type { Role } from "@/types";
+import type { ApiError } from "@/types";
 
 const RolesPage = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -62,8 +62,9 @@ const RolesPage = () => {
       }
       setDialogOpen(false);
     } catch (error: any) {
+      const apiError: ApiError = error;
       toast.error(
-        error.data?.message || (editingRole ? "Failed to update role" : "Failed to create role"),
+        apiError.data?.message || (editingRole ? "Failed to update role" : "Failed to create role"),
       );
     }
   };
@@ -74,8 +75,9 @@ const RolesPage = () => {
       await deleteRole(id).unwrap();
       toast.success("Role deleted successfully");
       refetch();
-    } catch (e) {
-      toast.error(getErrorMessage(e) || "Failed to delete role");
+    } catch (error: any) {
+      const apiError: ApiError = error;
+      toast.error(apiError.data?.message || "Failed to delete role");
     }
   };
 

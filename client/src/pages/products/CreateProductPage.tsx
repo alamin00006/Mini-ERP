@@ -5,6 +5,7 @@ import { ProductForm } from "@/components/products/ProductForm";
 import { useCreateProductMutation } from "@/redux";
 import { useAuth } from "@/hooks/useAuth";
 import type { ProductFormValues } from "@/schemas/productSchema";
+import type { ApiError } from "@/types";
 
 const CreateProductPage = () => {
   const navigate = useNavigate();
@@ -32,7 +33,8 @@ const CreateProductPage = () => {
       toast.success(result.data.message || "Product created successfully");
       navigate("/products");
     } catch (error: any) {
-      toast.error(error.data.message || "Failed to create product");
+      const apiError: ApiError = error;
+      toast.error(apiError.data?.message || "Failed to create product");
     }
   };
 

@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useGetNotificationsQuery, useMarkAsReadMutation, useMarkAllAsReadMutation } from "@/redux";
 import { useAuth } from "@/hooks/useAuth";
 import type { Notification } from "@/types";
+import type { ApiError } from "@/types";
 import { Bell, Calendar, MessageSquare, TrendingUp, Check, CheckCheck } from "lucide-react";
 import { toast } from "sonner";
 
@@ -67,7 +68,8 @@ const NotificationsPage = () => {
       await markAllAsRead().unwrap();
       toast.success("All notifications marked as read");
     } catch (error: any) {
-      toast.error(error.data?.message || "Failed to mark all notifications as read");
+      const apiError: ApiError = error;
+      toast.error(apiError.data?.message || "Failed to mark all notifications as read");
     }
   };
 

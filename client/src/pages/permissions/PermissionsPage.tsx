@@ -25,6 +25,7 @@ import {
   useDeletePermissionMutation,
 } from "@/redux";
 import type { Permission } from "@/types";
+import type { ApiError } from "@/types";
 
 export default function PermissionsPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -74,8 +75,9 @@ export default function PermissionsPage() {
       }
       setDialogOpen(false);
     } catch (error: any) {
+      const apiError: ApiError = error;
       toast.error(
-        error.data.message ||
+        apiError.data?.message ||
           (editingPermission ? "Failed to update permission" : "Failed to create permission"),
       );
     }

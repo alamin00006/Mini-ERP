@@ -18,6 +18,7 @@ import {
 } from "@/redux/api/rolesApi";
 import { useGetPermissionsQuery } from "@/redux/api/permissionsApi";
 import type { Role, Permission, UiSection } from "@/types";
+import type { ApiError } from "@/types";
 
 const RBACPage = () => {
   // Roles state
@@ -116,7 +117,8 @@ const RBACPage = () => {
       setRoleDialogOpen(false);
       refetchRoles();
     } catch (error: any) {
-      toast.error(error.data?.message || "Failed to save role");
+      const apiError: ApiError = error;
+      toast.error(apiError.data?.message || "Failed to save role");
     }
   };
 
@@ -127,7 +129,8 @@ const RBACPage = () => {
       toast.success("Role deleted successfully");
       refetchRoles();
     } catch (error: any) {
-      toast.error(error.data?.message || "Failed to delete role");
+      const apiError: ApiError = error;
+      toast.error(apiError.data?.message || "Failed to delete role");
     }
   };
 

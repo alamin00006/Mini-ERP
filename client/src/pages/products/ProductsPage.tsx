@@ -11,6 +11,7 @@ import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { useGetProductsQuery, useDeleteProductMutation, useGetCategoriesQuery } from "@/redux";
 import type { Product } from "@/types";
+import type { ApiError } from "@/types";
 import { useAuth } from "@/hooks/useAuth";
 import { Pagination } from "@/components/shared/Pagination";
 import { getProductColumns } from "@/pages/products/productColumns";
@@ -51,7 +52,8 @@ const ProductsPage = () => {
       toast.success("Product deleted");
       setToDelete(null);
     } catch (error: any) {
-      toast.error(error.data.message || "Failed to delete");
+      const apiError: ApiError = error;
+      toast.error(apiError.data?.message || "Failed to delete");
     }
   };
 

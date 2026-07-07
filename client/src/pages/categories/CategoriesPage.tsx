@@ -23,6 +23,7 @@ import {
 } from "@/redux";
 import { Pencil } from "lucide-react";
 import type { Category } from "@/types";
+import type { ApiError } from "@/types";
 import { useAuth } from "@/hooks/useAuth";
 
 const CategoriesPage = () => {
@@ -70,8 +71,9 @@ const CategoriesPage = () => {
       }
       setDialogOpen(false);
     } catch (error: any) {
+      const apiError: ApiError = error;
       toast.error(
-        error.data?.message ||
+        apiError.data?.message ||
           (editingCategory ? "Failed to update category" : "Failed to create category"),
       );
     }

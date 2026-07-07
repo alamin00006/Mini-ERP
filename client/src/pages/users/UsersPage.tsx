@@ -18,7 +18,6 @@ import { PermissionGuard } from "@/components/shared/PermissionGuard";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { RoleBadge } from "@/components/shared/RoleBadge";
-import { getErrorMessage } from "@/utils/getErrorMessage";
 
 import {
   useGetUsersQuery,
@@ -27,6 +26,7 @@ import {
   useToggleUserStatusMutation,
 } from "@/redux";
 import type { User } from "@/types";
+import type { ApiError } from "@/types";
 
 const UsersPage = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -90,9 +90,10 @@ const UsersPage = () => {
       }
 
       setDialogOpen(false);
-    } catch (e) {
+    } catch (error: any) {
+      const apiError: ApiError = error;
       toast.error(
-        getErrorMessage(e) || (editingUser ? "Failed to update user" : "Failed to create user"),
+        apiError.data?.message || (editingUser ? "Failed to update user" : "Failed to create user"),
       );
     }
   };
@@ -102,8 +103,9 @@ const UsersPage = () => {
       await toggleUserStatus(id).unwrap();
       toast.success("User status updated successfully");
       refetch();
-    } catch (e) {
-      toast.error(getErrorMessage(e) || "Failed to update user status");
+    } catch (error: any) {
+      const apiError: ApiError = error;
+      toast.error(apiError.data?.message || "Failed to update user status");
     }
   };
 

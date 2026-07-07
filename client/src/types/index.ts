@@ -14,6 +14,14 @@ export interface ApiEnvelope<T> {
   data: T;
 }
 
+// API Error type for consistent error handling
+export interface ApiError {
+  data?: {
+    message?: string;
+  };
+  status?: number;
+}
+
 // UI-specific types for RBAC components
 export interface UiPermission {
   id: string | number;
