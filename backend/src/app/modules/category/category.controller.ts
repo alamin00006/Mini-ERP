@@ -8,7 +8,7 @@ import { CategoryService } from './category.service'
  * Creates a new category
  * @param req - Express request object containing category data
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const createCategory = async (
   req: Request,
@@ -32,7 +32,7 @@ const createCategory = async (
  * Retrieves all categories
  * @param req - Express request object
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const getAllCategories = async (
   req: Request,
@@ -56,7 +56,7 @@ const getAllCategories = async (
  * Retrieves a category by ID
  * @param req - Express request object with category ID in params
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const getCategoryById = async (
   req: Request,
@@ -81,7 +81,7 @@ const getCategoryById = async (
  * Updates a category by ID
  * @param req - Express request object with category ID in params and update data in body
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const updateCategory = async (
   req: Request,

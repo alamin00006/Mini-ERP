@@ -7,7 +7,7 @@ import { UserService } from './user.service'
  * Creates a new user
  * @param req - Express request object containing user data
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const createUser = async (
   req: Request,
@@ -31,7 +31,7 @@ const createUser = async (
  * Retrieves all users
  * @param req - Express request object
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const getAllUsers = async (
   req: Request,
@@ -55,7 +55,7 @@ const getAllUsers = async (
  * Retrieves a user by ID
  * @param req - Express request object with user ID in params
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const getUserById = async (
   req: Request,
@@ -80,7 +80,7 @@ const getUserById = async (
  * Updates a user by ID
  * @param req - Express request object with user ID in params and update data in body
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const updateUser = async (
   req: Request,
@@ -105,7 +105,6 @@ const updateUser = async (
  * Toggles user active/inactive status
  * @param req - Express request object with user ID in params
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
  */
 const toggleUserStatus = async (
   req: Request,

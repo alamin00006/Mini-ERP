@@ -7,7 +7,7 @@ import { DashboardService } from './dashboard.service'
  * Retrieves dashboard statistics
  * @param req - Express request object
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const getDashboardStats = async (
   req: Request,

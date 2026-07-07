@@ -4,8 +4,6 @@ import { NextFunction, Request, Response } from 'express'
 import ApiError from '../../errors/ApiError'
 import config from '../../config'
 import User from '../../app/modules/user/user.model'
-import Role from '../../app/modules/role/role.model'
-import Permission from '../../app/modules/permission/permission.model'
 import UserRole from '../../app/modules/userRole/userRole.model'
 import RolePermission from '../../app/modules/rolePermission/rolePermission.model'
 

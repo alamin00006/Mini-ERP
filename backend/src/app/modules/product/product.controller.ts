@@ -8,7 +8,7 @@ import { ProductService } from './product.service'
  * Creates a new product with image upload
  * @param req - Express request object containing product data and image file
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const createProduct = async (
   req: Request,
@@ -40,7 +40,7 @@ const createProduct = async (
  * Retrieves all products with pagination, search, and filtering
  * @param req - Express request object with query parameters (page, limit, search, sortBy, sortOrder, category)
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const getAllProducts = async (
   req: Request,
@@ -73,7 +73,7 @@ const getAllProducts = async (
  * Retrieves a product by ID
  * @param req - Express request object with product ID in params
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const getProductById = async (
   req: Request,
@@ -98,7 +98,7 @@ const getProductById = async (
  * Updates a product by ID with optional image upload
  * @param req - Express request object with product ID in params, update data in body, and optional image file
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const updateProduct = async (
   req: Request,
@@ -128,7 +128,7 @@ const updateProduct = async (
  * Deletes a product by ID (soft delete)
  * @param req - Express request object with product ID in params
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const deleteProduct = async (
   req: Request,

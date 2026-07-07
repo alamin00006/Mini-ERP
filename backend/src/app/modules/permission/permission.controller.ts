@@ -7,7 +7,7 @@ import { PermissionService } from './permission.service'
  * Creates a new permission
  * @param req - Express request object containing permission data
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const createPermission = async (
   req: Request,
@@ -31,7 +31,7 @@ const createPermission = async (
  * Retrieves all permissions
  * @param req - Express request object
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const getAllPermissions = async (
   req: Request,
@@ -55,7 +55,7 @@ const getAllPermissions = async (
  * Retrieves a permission by ID
  * @param req - Express request object with permission ID in params
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const getPermissionById = async (
   req: Request,
@@ -80,7 +80,7 @@ const getPermissionById = async (
  * Updates a permission by ID
  * @param req - Express request object with permission ID in params and update data in body
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const updatePermission = async (
   req: Request,
@@ -108,7 +108,7 @@ const updatePermission = async (
  * Deletes a permission by ID
  * @param req - Express request object with permission ID in params
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const deletePermission = async (
   req: Request,
