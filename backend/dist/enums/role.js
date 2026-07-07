@@ -6,5 +6,4 @@ var ENUM_USER_ROLE;
     ENUM_USER_ROLE["ADMIN"] = "Admin";
     ENUM_USER_ROLE["MANAGER"] = "Manager";
     ENUM_USER_ROLE["EMPLOYEE"] = "Employee";
-    ENUM_USER_ROLE["COMPANY"] = "Company";
 })(ENUM_USER_ROLE || (exports.ENUM_USER_ROLE = ENUM_USER_ROLE = {}));

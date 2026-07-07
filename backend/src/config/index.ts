@@ -21,4 +21,9 @@ export default {
     endpoint: process.env.R2_ENDPOINT,
     public_url: process.env.R2_PUBLIC_URL,
   },
+
+  allowed_origins: process.env.ALLOWED_ORIGINS?.split(',') || [
+    'http://localhost:3000',
+    'http://localhost:5173',
+  ],
 }

@@ -9,6 +9,7 @@ import globalErrorHandler from './errors/globalErrorHandler'
 import { handleMulterError } from './app/middlewares/multer'
 
 import { databaseConnect } from './helpers/dbConnect'
+import config from './config'
 
 const app = express()
 const server = http.createServer(app)
@@ -16,7 +17,7 @@ const server = http.createServer(app)
 // ============================
 // Allowed Origins
 // ============================
-const allowedOrigins = ['http://localhost:3000', 'http://localhost:5173']
+const allowedOrigins = config.allowed_origins
 
 // ============================
 // Middleware

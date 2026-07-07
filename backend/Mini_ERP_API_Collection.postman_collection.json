@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Mini ERP API",
-    "description": "Complete API collection for Mini ERP system with authentication, products, sales, and more",
+    "description": "Complete API collection for Mini ERP system with authentication, products, sales, categories, notifications, and more",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "mini-erp-backend"
   },
@@ -58,6 +58,111 @@
               }
             }
           ]
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Electronics\",\n  \"description\": \"Electronic devices and gadgets\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories"]
+            },
+            "description": "Create a new product category"
+          }
+        },
+        {
+          "name": "Get All Categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories"]
+            },
+            "description": "Get all categories"
+          }
+        },
+        {
+          "name": "Get Category By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/categories/CATEGORY_ID_HERE",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories", "CATEGORY_ID_HERE"],
+              "variable": [
+                {
+                  "key": "CATEGORY_ID_HERE",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Get a single category by ID"
+          }
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Electronics & Gadgets\",\n  \"description\": \"Updated description\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/categories/CATEGORY_ID_HERE",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories", "CATEGORY_ID_HERE"],
+              "variable": [
+                {
+                  "key": "CATEGORY_ID_HERE",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Update category details"
+          }
         }
       ]
     },
@@ -371,6 +476,79 @@
       ]
     },
     {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Get All Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            },
+            "description": "Get all notifications with filters (query params: status, type, etc.)"
+          }
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/NOTIFICATION_ID_HERE/read",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "NOTIFICATION_ID_HERE", "read"],
+              "variable": [
+                {
+                  "key": "NOTIFICATION_ID_HERE",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Mark a single notification as read"
+          }
+        },
+        {
+          "name": "Mark All Notifications as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"read\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications/read-all",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "read-all"]
+            },
+            "description": "Mark all notifications as read for the current user"
+          }
+        }
+      ]
+    },
+    {
       "name": "Dashboard",
       "item": [
         {
@@ -419,7 +597,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["users"]
             },
-            "description": "Create a new user. Role must be one of: Admin, Manager, Employee"
+            "description": "Create a new user. Role must be one of: Admin, Manager, Employee, Company"
           }
         },
         {
@@ -497,7 +675,7 @@
           }
         },
         {
-          "name": "Deactivate User",
+          "name": "Toggle User Status",
           "request": {
             "method": "PATCH",
             "header": [
@@ -507,9 +685,9 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/users/USER_ID_HERE/deactivate",
+              "raw": "{{baseUrl}}/users/USER_ID_HERE/toggle-status",
               "host": ["{{baseUrl}}"],
-              "path": ["users", "USER_ID_HERE", "deactivate"],
+              "path": ["users", "USER_ID_HERE", "toggle-status"],
               "variable": [
                 {
                   "key": "USER_ID_HERE",
@@ -517,7 +695,7 @@
                 }
               ]
             },
-            "description": "Deactivate a user (sets isActive to false)"
+            "description": "Toggle user active/inactive status"
           }
         }
       ]
@@ -647,6 +825,30 @@
               ]
             },
             "description": "Deactivate a role (cannot deactivate system roles like Admin)"
+          }
+        },
+        {
+          "name": "Delete Role",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/roles/ROLE_ID_HERE",
+              "host": ["{{baseUrl}}"],
+              "path": ["roles", "ROLE_ID_HERE"],
+              "variable": [
+                {
+                  "key": "ROLE_ID_HERE",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Permanently delete a role (hard delete)"
           }
         }
       ]

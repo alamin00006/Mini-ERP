@@ -14,6 +14,7 @@ const index_1 = __importDefault(require("./app/routes/index"));
 const globalErrorHandler_1 = __importDefault(require("./errors/globalErrorHandler"));
 const multer_1 = require("./app/middlewares/multer");
 const dbConnect_1 = require("./helpers/dbConnect");
+const config_1 = __importDefault(require("./config"));
 const app = (0, express_1.default)();
 exports.app = app;
 const server = http_1.default.createServer(app);
@@ -21,7 +22,7 @@ exports.server = server;
 // ============================
 // Allowed Origins
 // ============================
-const allowedOrigins = ['http://localhost:3000', 'http://localhost:5173'];
+const allowedOrigins = config_1.default.allowed_origins;
 // ============================
 // Middleware
 // ============================

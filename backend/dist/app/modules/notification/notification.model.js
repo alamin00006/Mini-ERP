@@ -62,7 +62,7 @@ const notificationSchema = new mongoose_1.Schema({
     roles: {
         type: [String],
         enum: Object.values(role_1.ENUM_USER_ROLE),
-        default: [role_1.ENUM_USER_ROLE.COMPANY],
+        default: [role_1.ENUM_USER_ROLE.ADMIN],
     },
     type: {
         type: String,
