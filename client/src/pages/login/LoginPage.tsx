@@ -46,7 +46,13 @@ export default function LoginPage() {
     setError(null);
     try {
       const result = await login({ email: values.email, password: values.password }).unwrap();
-      dispatch(setCredentials({ token: result.data.token, user: result.data.user }));
+      dispatch(
+        setCredentials({
+          token: result.data.accessToken,
+          user: result.data.user,
+          permissions: [],
+        }),
+      );
       toast.success(`Welcome, ${result.data.user.name}`);
 
       navigate("/dashboard", { replace: true });

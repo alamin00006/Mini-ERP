@@ -4,12 +4,14 @@ import type { User } from "@/types";
 interface AuthState {
   token: string | null;
   user: User | null;
+  permissions: string[];
   hydrated: boolean;
 }
 
 const initialState: AuthState = {
   token: null,
   user: null,
+  permissions: [],
   hydrated: false,
 };
 
@@ -35,24 +37,37 @@ const authSlice = createSlice({
       }
       state.hydrated = true;
     },
-    setCredentials(state, action: PayloadAction<{ token: string; user: User }>) {
+    setCredentials(
+      state,
+      action: PayloadAction<{ token: string; user: User; permissions: string[] }>,
+    ) {
       state.token = action.payload.token;
       state.user = action.payload.user;
+      state.permissions = action.payload.permissions;
       if (typeof window !== "undefined") {
         window.localStorage.setItem("erp_token", action.payload.token);
         window.localStorage.setItem("erp_user", JSON.stringify(action.payload.user));
+        window.localStorage.setItem("erp_permissions", JSON.stringify(action.payload.permissions));
+      }
+    },
+    setPermissions(state, action: PayloadAction<string[]>) {
+      state.permissions = action.payload;
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("erp_permissions", JSON.stringify(action.payload));
       }
     },
     logout(state) {
       state.token = null;
       state.user = null;
+      state.permissions = [];
       if (typeof window !== "undefined") {
         window.localStorage.removeItem("erp_token");
         window.localStorage.removeItem("erp_user");
+        window.localStorage.removeItem("erp_permissions");
       }
     },
   },
 });
 
-export const { hydrate, setCredentials, logout } = authSlice.actions;
+export const { hydrate, setCredentials, setPermissions, logout } = authSlice.actions;
 export default authSlice.reducer;

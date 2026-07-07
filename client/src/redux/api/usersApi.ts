@@ -41,9 +41,9 @@ export const usersApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: (_result, _error, { id }) => [{ type: "user", id }, "user"],
     }),
-    deactivateUser: build.mutation<void, string | number>({
+    toggleUserStatus: build.mutation<User, string | number>({
       query: (id) => ({
-        url: `/users/${id}/deactivate`,
+        url: `/users/${id}/toggle-status`,
         method: "PATCH",
       }),
       invalidatesTags: ["user"],
@@ -56,5 +56,5 @@ export const {
   useGetUserQuery,
   useCreateUserMutation,
   useUpdateUserMutation,
-  useDeactivateUserMutation,
+  useToggleUserStatusMutation,
 } = usersApi;

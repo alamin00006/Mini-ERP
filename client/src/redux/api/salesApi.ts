@@ -11,7 +11,15 @@ export const salesApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Sales", "Dashboard"],
     }),
+    getSales: build.query<any, { page?: number; limit?: number }>({
+      query: (params) => ({
+        url: "/sales",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["Sales"],
+    }),
   }),
 });
 
-export const { useCreateSaleMutation } = salesApi;
+export const { useCreateSaleMutation, useGetSalesQuery } = salesApi;

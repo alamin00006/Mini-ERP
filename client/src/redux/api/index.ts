@@ -18,6 +18,6 @@ export const {
 
 export const { useGetStatsQuery } = dashboardApi;
 
-export const { useCreateSaleMutation } = salesApi;
+export const { useCreateSaleMutation, useGetSalesQuery } = salesApi;
 
 export const { useGetNotificationsQuery } = notificationsApi;

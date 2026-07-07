@@ -47,7 +47,9 @@ const createUser = async (payload: {
     password: hashedPassword,
   })
 
-  const roleDoc = await Role.findOne({ name: role })
+  const roleDoc = await Role.findOne({
+    name: { $regex: new RegExp(`^${role}$`, 'i') },
+  })
   if (!roleDoc) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Role not found')
   }
@@ -169,7 +171,9 @@ const updateUser = async (
   const updatedUser = await User.findByIdAndUpdate(id, payload, { new: true })
 
   if (payload.role) {
-    const roleDoc = await Role.findOne({ name: payload.role })
+    const roleDoc = await Role.findOne({
+      name: { $regex: new RegExp(`^${payload.role}$`, 'i') },
+    })
     if (roleDoc) {
       await UserRole.findOneAndUpdate(
         { user: id },
@@ -193,32 +197,32 @@ const updateUser = async (
 }
 
 /**
- * Deactivates a user by ID (soft delete)
- * @param id - User ID to deactivate
- * @returns Promise<TUserResponse> - Deactivated user data
+ * Toggles user active/inactive status
+ * @param id - User ID to toggle
+ * @returns Promise<TUserResponse> - Updated user data
  */
-const deactivateUser = async (id: string): Promise<TUserResponse> => {
+const toggleUserStatus = async (id: string): Promise<TUserResponse> => {
   const user = await User.findById(id)
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found')
   }
 
-  const deactivatedUser = await User.findByIdAndUpdate(
+  const updatedUser = await User.findByIdAndUpdate(
     id,
-    { isActive: false },
+    { isActive: !user.isActive },
     { new: true },
   )
 
   const userRole = await UserRole.findOne({ user: id }).populate('role')
 
   return {
-    _id: deactivatedUser!._id.toString(),
-    name: deactivatedUser!.name,
-    email: deactivatedUser!.email,
+    _id: updatedUser!._id.toString(),
+    name: updatedUser!.name,
+    email: updatedUser!.email,
     role: (userRole?.role as any)?.name || 'No Role',
-    isActive: deactivatedUser!.isActive,
-    createdAt: deactivatedUser!.createdAt,
-    updatedAt: deactivatedUser!.updatedAt,
+    isActive: updatedUser!.isActive,
+    createdAt: updatedUser!.createdAt,
+    updatedAt: updatedUser!.updatedAt,
   }
 }
 
@@ -227,5 +231,5 @@ export const UserService = {
   getAllUsers,
   getUserById,
   updateUser,
-  deactivateUser,
+  toggleUserStatus,
 }

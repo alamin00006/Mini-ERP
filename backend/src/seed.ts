@@ -15,15 +15,6 @@ import Sale from './app/modules/sale/sale.model'
 dotenv.config()
 
 const defaultPermissions = [
-  // Auth permissions
-  {
-    key: 'auth.login',
-    name: 'Login',
-    description: 'User login',
-    group: 'Auth',
-    module: 'Auth',
-  },
-
   // User permissions
   {
     key: 'user.create',

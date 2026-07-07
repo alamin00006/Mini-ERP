@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -16,7 +15,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Users, Shield, Plus, Pencil, Trash2, List } from "lucide-react";
+import { Users, Plus, Pencil, Trash2, List, Shield } from "lucide-react";
 import {
   useGetRolesQuery,
   useCreateRoleMutation,
@@ -25,12 +24,7 @@ import {
   useSetRolePermissionsMutation,
   useGetRolePermissionsQuery,
 } from "@/redux/api/rolesApi";
-import {
-  useGetPermissionsQuery,
-  useCreatePermissionMutation,
-  useUpdatePermissionMutation,
-  useDeletePermissionMutation,
-} from "@/redux/api/permissionsApi";
+import { useGetPermissionsQuery } from "@/redux/api/permissionsApi";
 import type { Role, Permission } from "@/types";
 
 type UiPermission = {
@@ -45,24 +39,11 @@ type UiSection = {
   permissions: UiPermission[];
 };
 
-export default function RBACPage() {
-  const [activeTab, setActiveTab] = useState("roles");
-
+const RBACPage = () => {
   // Roles state
   const [roleDialogOpen, setRoleDialogOpen] = useState(false);
   const [editingRole, setEditingRole] = useState<Role | null>(null);
   const [roleFormData, setRoleFormData] = useState({ name: "", description: "" });
-
-  // Permissions state
-  const [permDialogOpen, setPermDialogOpen] = useState(false);
-  const [editingPerm, setEditingPerm] = useState<Permission | null>(null);
-  const [permFormData, setPermFormData] = useState({
-    key: "",
-    name: "",
-    description: "",
-    group: "",
-    module: "",
-  });
 
   // Role permissions state
   const [selectedRoleId, setSelectedRoleId] = useState<string | number | null>(null);
@@ -71,11 +52,8 @@ export default function RBACPage() {
 
   // Queries
   const { data: rolesData, isLoading: rolesLoading, refetch: refetchRoles } = useGetRolesQuery();
-  const {
-    data: permsData,
-    isLoading: permsLoading,
-    refetch: refetchPerms,
-  } = useGetPermissionsQuery();
+  const { data: permsData } = useGetPermissionsQuery();
+  const permissions = permsData?.data ?? [];
   const {
     data: rolePermsData,
     isLoading: rolePermsLoading,
@@ -88,13 +66,9 @@ export default function RBACPage() {
   const [createRole, { isLoading: creatingRole }] = useCreateRoleMutation();
   const [updateRole, { isLoading: updatingRole }] = useUpdateRoleMutation();
   const [deleteRole] = useDeleteRoleMutation();
-  const [createPerm, { isLoading: creatingPerm }] = useCreatePermissionMutation();
-  const [updatePerm, { isLoading: updatingPerm }] = useUpdatePermissionMutation();
-  const [deletePerm] = useDeletePermissionMutation();
   const [setRolePerms, { isLoading: savingPerms }] = useSetRolePermissionsMutation();
 
   const roles = rolesData?.data ?? [];
-  const permissions = permsData?.data ?? [];
 
   // Group permissions by module/group
   const groupedPermissions = useMemo(() => {
@@ -174,53 +148,6 @@ export default function RBACPage() {
       refetchRoles();
     } catch (e: any) {
       toast.error(e?.data?.message || "Failed to delete role");
-    }
-  };
-
-  // Permission handlers
-  const openCreatePerm = () => {
-    setEditingPerm(null);
-    setPermFormData({ key: "", name: "", description: "", group: "", module: "" });
-    setPermDialogOpen(true);
-  };
-
-  const openEditPerm = (perm: Permission) => {
-    setEditingPerm(perm);
-    setPermFormData({
-      key: perm.key,
-      name: perm.name,
-      description: perm.description || "",
-      group: perm.group || "",
-      module: perm.module || "",
-    });
-    setPermDialogOpen(true);
-  };
-
-  const handlePermSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      if (editingPerm) {
-        await updatePerm({ id: editingPerm._id, data: permFormData }).unwrap();
-        toast.success("Permission updated successfully");
-      } else {
-        await createPerm(permFormData).unwrap();
-        toast.success("Permission created successfully");
-      }
-      setPermDialogOpen(false);
-      refetchPerms();
-    } catch (e: any) {
-      toast.error(e?.data?.message || "Failed to save permission");
-    }
-  };
-
-  const handleDeletePerm = async (id: string | number) => {
-    if (!confirm("Are you sure you want to delete this permission?")) return;
-    try {
-      await deletePerm(id).unwrap();
-      toast.success("Permission deleted successfully");
-      refetchPerms();
-    } catch (e: any) {
-      toast.error(e?.data?.message || "Failed to delete permission");
     }
   };
 
@@ -337,243 +264,113 @@ export default function RBACPage() {
         </p>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="bg-transparent border-b border-border rounded-none h-auto p-0 mb-6">
-          <TabsTrigger
-            value="roles"
-            className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none px-4 py-3 text-sm gap-2"
-          >
-            <Users className="w-4 h-4" />
-            ROLES
-          </TabsTrigger>
-          <TabsTrigger
-            value="permissions"
-            className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none px-4 py-3 text-sm gap-2"
-          >
-            <Shield className="w-4 h-4" />
-            PERMISSIONS
-          </TabsTrigger>
-        </TabsList>
-
-        {/* Roles Tab */}
-        <TabsContent value="roles" className="mt-0 space-y-6">
-          <Card>
-            <CardHeader className="border-b border-border">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg font-semibold">Roles</CardTitle>
-                <Button onClick={openCreateRole} size="sm" className="gap-2">
-                  <Plus className="w-4 h-4" />
-                  Add Role
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              {rolesLoading ? (
-                <div className="p-6 text-sm text-muted-foreground">Loading...</div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-border bg-muted/40">
-                        <th className="text-left px-6 py-3 text-sm font-semibold text-foreground">
-                          #
-                        </th>
-                        <th className="text-left px-6 py-3 text-sm font-semibold text-foreground">
-                          Role Name
-                        </th>
-                        <th className="text-left px-6 py-3 text-sm font-semibold text-foreground">
-                          Description
-                        </th>
-                        <th className="text-left px-6 py-3 text-sm font-semibold text-foreground">
-                          System Role
-                        </th>
-                        <th className="text-right px-6 py-3 text-sm font-semibold text-foreground">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {roles.map((role, idx) => (
-                        <tr key={role._id} className="border-b border-border hover:bg-muted/20">
-                          <td className="px-6 py-4 text-sm text-muted-foreground">{idx + 1}</td>
-                          <td className="px-6 py-4">
-                            <span className="text-sm font-medium text-foreground">{role.name}</span>
-                          </td>
-                          <td className="px-6 py-4 text-sm text-muted-foreground">
-                            {role.description || "-"}
-                          </td>
-                          <td className="px-6 py-4">
-                            {role.isSystem ? (
-                              <Badge
-                                variant="default"
-                                className="bg-blue-500/10 text-blue-600 hover:bg-blue-500/20"
-                              >
-                                Yes
-                              </Badge>
-                            ) : (
-                              <Badge variant="secondary" className="bg-gray-500/10 text-gray-600">
-                                No
-                              </Badge>
-                            )}
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center justify-end gap-2">
-                              <Button
-                                type="button"
-                                size="icon"
-                                variant="outline"
-                                className="h-8 w-8"
-                                title="Assign Permissions"
-                                onClick={() => openAssignPerms(role._id)}
-                              >
-                                <List className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                type="button"
-                                size="icon"
-                                variant="outline"
-                                className="h-8 w-8"
-                                onClick={() => openEditRole(role)}
-                              >
-                                <Pencil className="h-4 w-4" />
-                              </Button>
-                              {!role.isSystem && (
-                                <Button
-                                  type="button"
-                                  size="icon"
-                                  variant="destructive"
-                                  className="h-8 w-8"
-                                  onClick={() => handleDeleteRole(role._id)}
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                      {roles.length === 0 && (
-                        <tr>
-                          <td colSpan={5} className="px-6 py-10 text-center">
-                            <div className="text-sm text-muted-foreground">No roles found</div>
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Permissions Tab */}
-        <TabsContent value="permissions" className="mt-0 space-y-6">
-          <Card>
-            <CardHeader className="border-b border-border">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg font-semibold">Permissions</CardTitle>
-                <Button onClick={openCreatePerm} size="sm" className="gap-2">
-                  <Plus className="w-4 h-4" />
-                  Add Permission
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              {permsLoading ? (
-                <div className="p-6 text-sm text-muted-foreground">Loading...</div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-border bg-muted/40">
-                        <th className="text-left px-6 py-3 text-sm font-semibold text-foreground">
-                          Key
-                        </th>
-                        <th className="text-left px-6 py-3 text-sm font-semibold text-foreground">
-                          Name
-                        </th>
-                        <th className="text-left px-6 py-3 text-sm font-semibold text-foreground">
-                          Group
-                        </th>
-                        <th className="text-left px-6 py-3 text-sm font-semibold text-foreground">
-                          Module
-                        </th>
-                        <th className="text-left px-6 py-3 text-sm font-semibold text-foreground">
-                          System
-                        </th>
-                        <th className="text-right px-6 py-3 text-sm font-semibold text-foreground">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {permissions.map((perm) => (
-                        <tr key={perm._id} className="border-b border-border hover:bg-muted/20">
-                          <td className="px-6 py-4">
-                            <code className="text-xs bg-muted px-2 py-1 rounded">{perm.key}</code>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="text-sm font-medium">{perm.name}</span>
-                          </td>
-                          <td className="px-6 py-4 text-sm text-muted-foreground">
-                            {perm.group || "-"}
-                          </td>
-                          <td className="px-6 py-4 text-sm text-muted-foreground">
-                            {perm.module || "-"}
-                          </td>
-                          <td className="px-6 py-4">
-                            {perm.isSystem ? (
-                              <Badge variant="default" className="bg-blue-500/10 text-blue-600">
-                                Yes
-                              </Badge>
-                            ) : (
-                              <Badge variant="secondary" className="bg-gray-500/10 text-gray-600">
-                                No
-                              </Badge>
-                            )}
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center justify-end gap-2">
-                              <Button
-                                type="button"
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => openEditPerm(perm)}
-                              >
-                                Edit
-                              </Button>
-                              {!perm.isSystem && (
-                                <Button
-                                  type="button"
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={() => handleDeletePerm(perm._id)}
-                                >
-                                  Delete
-                                </Button>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                      {permissions.length === 0 && (
-                        <tr>
-                          <td colSpan={6} className="px-6 py-10 text-center">
-                            <div className="text-sm text-muted-foreground">
-                              No permissions found
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+      {/* Roles Section */}
+      <Card>
+        <CardHeader className="border-b border-border">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg font-semibold">Roles</CardTitle>
+            <Button onClick={openCreateRole} size="sm" className="gap-2">
+              <Plus className="w-4 h-4" />
+              Add Role
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          {rolesLoading ? (
+            <div className="p-6 text-sm text-muted-foreground">Loading...</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-border bg-muted/40">
+                    <th className="text-left px-6 py-3 text-sm font-semibold text-foreground">#</th>
+                    <th className="text-left px-6 py-3 text-sm font-semibold text-foreground">
+                      Role Name
+                    </th>
+                    <th className="text-left px-6 py-3 text-sm font-semibold text-foreground">
+                      Description
+                    </th>
+                    <th className="text-left px-6 py-3 text-sm font-semibold text-foreground">
+                      System Role
+                    </th>
+                    <th className="text-right px-6 py-3 text-sm font-semibold text-foreground">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {roles.map((role, idx) => (
+                    <tr key={role._id} className="border-b border-border hover:bg-muted/20">
+                      <td className="px-6 py-4 text-sm text-muted-foreground">{idx + 1}</td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm font-medium text-foreground">{role.name}</span>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-muted-foreground">
+                        {role.description || "-"}
+                      </td>
+                      <td className="px-6 py-4">
+                        {role.isSystem ? (
+                          <Badge
+                            variant="default"
+                            className="bg-blue-500/10 text-blue-600 hover:bg-blue-500/20"
+                          >
+                            Yes
+                          </Badge>
+                        ) : (
+                          <Badge variant="secondary" className="bg-gray-500/10 text-gray-600">
+                            No
+                          </Badge>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button
+                            type="button"
+                            size="icon"
+                            variant="outline"
+                            className="h-8 w-8"
+                            title="Assign Permissions"
+                            onClick={() => openAssignPerms(role._id)}
+                          >
+                            <List className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            type="button"
+                            size="icon"
+                            variant="outline"
+                            className="h-8 w-8"
+                            onClick={() => openEditRole(role)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          {!role.isSystem && (
+                            <Button
+                              type="button"
+                              size="icon"
+                              variant="destructive"
+                              className="h-8 w-8"
+                              onClick={() => handleDeleteRole(role._id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {roles.length === 0 && (
+                    <tr>
+                      <td colSpan={5} className="px-6 py-10 text-center">
+                        <div className="text-sm text-muted-foreground">No roles found</div>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Role Dialog */}
       <Dialog open={roleDialogOpen} onOpenChange={setRoleDialogOpen}>
@@ -605,65 +402,6 @@ export default function RBACPage() {
               </Button>
               <Button type="submit" disabled={creatingRole || updatingRole}>
                 {creatingRole || updatingRole ? "Saving..." : editingRole ? "Update" : "Create"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Permission Dialog */}
-      <Dialog open={permDialogOpen} onOpenChange={setPermDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{editingPerm ? "Edit Permission" : "Create Permission"}</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handlePermSubmit} className="space-y-4">
-            <div>
-              <Label>Key</Label>
-              <Input
-                required
-                value={permFormData.key}
-                onChange={(e) => setPermFormData({ ...permFormData, key: e.target.value })}
-                placeholder="e.g. user.create"
-              />
-            </div>
-            <div>
-              <Label>Name</Label>
-              <Input
-                required
-                value={permFormData.name}
-                onChange={(e) => setPermFormData({ ...permFormData, name: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label>Description</Label>
-              <Input
-                value={permFormData.description}
-                onChange={(e) => setPermFormData({ ...permFormData, description: e.target.value })}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Group</Label>
-                <Input
-                  value={permFormData.group}
-                  onChange={(e) => setPermFormData({ ...permFormData, group: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label>Module</Label>
-                <Input
-                  value={permFormData.module}
-                  onChange={(e) => setPermFormData({ ...permFormData, module: e.target.value })}
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setPermDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={creatingPerm || updatingPerm}>
-                {creatingPerm || updatingPerm ? "Saving..." : editingPerm ? "Update" : "Create"}
               </Button>
             </DialogFooter>
           </form>
@@ -803,4 +541,6 @@ export default function RBACPage() {
       </Dialog>
     </div>
   );
-}
+};
+
+export default RBACPage;

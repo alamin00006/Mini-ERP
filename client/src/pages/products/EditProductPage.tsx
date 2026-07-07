@@ -21,16 +21,16 @@ export default function EditProductPage() {
   }, [hydrated, hasRole, navigate]);
 
   const handleSubmit = async (values: any, image: File | null) => {
-    const fd = new FormData();
-    fd.append("name", values.name);
-    fd.append("category", values.category);
-    fd.append("purchasePrice", String(values.purchasePrice));
-    fd.append("sellingPrice", String(values.sellingPrice));
-    fd.append("stockQuantity", String(values.stockQuantity));
-    if (image) fd.append("image", image);
+    const formData = new FormData();
+    formData.append("name", values.name);
+    formData.append("category", values.category);
+    formData.append("purchasePrice", String(values.purchasePrice));
+    formData.append("sellingPrice", String(values.sellingPrice));
+    formData.append("stockQuantity", String(values.stockQuantity));
+    if (image) formData.append("image", image);
 
     try {
-      await updateProduct({ id, form: fd }).unwrap();
+      await updateProduct({ id, form: formData }).unwrap();
       toast.success("Product updated");
       navigate("/products");
     } catch (e) {

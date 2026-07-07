@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { Plus, Pencil, Trash2, Search, ImageIcon } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Plus, Pencil, Trash2, Search, ImageIcon, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,8 +21,6 @@ import { useGetProductsQuery, useDeleteProductMutation, useGetCategoriesQuery } 
 import type { Product, Category } from "@/types";
 import { useAuth } from "@/hooks/useAuth";
 import { Pagination } from "@/components/shared/Pagination";
-
-const PAGE_SIZE_OPTIONS = [5, 10, 20, 50, 100] as const;
 
 export default function ProductsPage() {
   const [page, setPage] = useState(1);
@@ -47,6 +45,7 @@ export default function ProductsPage() {
   const categories = categoriesData?.data ?? [];
 
   const [deleteProduct] = useDeleteProductMutation();
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const products = data?.data ?? [];
 
@@ -77,7 +76,7 @@ export default function ProductsPage() {
     {
       key: "category",
       header: "Category",
-      render: (p) => getCategoryName(p.category),
+      render: (p) => getCategoryName(p.categoryId),
     },
     { key: "purchase", header: "Purchase", render: (p) => `$${p.purchasePrice.toFixed(2)}` },
     { key: "selling", header: "Selling", render: (p) => `$${p.sellingPrice.toFixed(2)}` },
@@ -90,40 +89,42 @@ export default function ProductsPage() {
         </span>
       ),
     },
-    {
-      key: "actions",
-      header: "Actions",
-      className: "w-32 text-right",
-      render: (p) => (
-        <div className="flex justify-end gap-1">
-          <RoleBasedGuard roles={["Admin", "Manager"]}>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => {
-                navigate(`/products/edit/${p._id}`);
-              }}
-              aria-label="Edit"
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
-          </RoleBasedGuard>
-          <RoleBasedGuard roles={["Admin"]}>
-            <Button variant="ghost" size="icon" onClick={() => setToDelete(p)} aria-label="Delete">
-              <Trash2 className="h-4 w-4 text-destructive" />
-            </Button>
-          </RoleBasedGuard>
-        </div>
-      ),
-    },
+    ...(user?.role !== "Employee"
+      ? [
+          {
+            key: "actions" as const,
+            header: "Actions" as const,
+            className: "w-32 text-right" as const,
+            render: (p: Product) => (
+              <div className="flex justify-end gap-1">
+                <RoleBasedGuard roles={["Admin", "Manager"]}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      navigate(`/products/edit/${p._id}`);
+                    }}
+                    aria-label="Edit"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </RoleBasedGuard>
+                <RoleBasedGuard roles={["Admin", "Manager"]}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setToDelete(p)}
+                    aria-label="Delete"
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </RoleBasedGuard>
+              </div>
+            ),
+          },
+        ]
+      : []),
   ];
-
-  const applyPageSize = (raw: string) => {
-    const n = Math.floor(Number(raw));
-    if (!Number.isFinite(n) || n < 1) return;
-    setPageSize(Math.min(n, 500));
-    setPage(1);
-  };
 
   const handleDelete = async (id: string | number) => {
     try {
@@ -134,6 +135,34 @@ export default function ProductsPage() {
       toast.error("Failed to delete");
     }
   };
+
+  // Debounced search effect
+  useEffect(() => {
+    // Clear previous timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    // If search input is empty, clear search immediately
+    if (!searchInput.trim()) {
+      setSearch("");
+      setPage(1);
+      return;
+    }
+
+    // Set new timer for debounced search
+    debounceTimerRef.current = setTimeout(() => {
+      setSearch(searchInput.trim());
+      setPage(1);
+    }, 500); // 500ms debounce delay
+
+    // Cleanup
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [searchInput]);
 
   return (
     <div className="space-y-6">
@@ -150,42 +179,45 @@ export default function ProductsPage() {
       </div>
 
       <Card className="p-4">
-        <form
-          className="flex flex-col gap-2 sm:flex-row"
-          onSubmit={(e) => {
-            e.preventDefault();
-            setPage(1);
-            setSearch(searchInput.trim());
-          }}
-        >
+        <div className="flex flex-col gap-2 sm:flex-row">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              className="pl-9"
+              className="pl-9 pr-9"
               placeholder="Search by name, SKU, category…"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
             />
-          </div>
-          <div className="flex gap-2">
-            <Button type="submit" variant="secondary" className="flex-1 sm:flex-none">
-              Search
-            </Button>
-            {search && (
-              <Button
+            {searchInput && (
+              <button
                 type="button"
-                variant="ghost"
-                onClick={() => {
-                  setSearch("");
-                  setSearchInput("");
-                  setPage(1);
-                }}
+                onClick={() => setSearchInput("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
-                Clear
-              </Button>
+                <X className="h-4 w-4" />
+              </button>
             )}
           </div>
-        </form>
+          {search && (
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                setSearch("");
+                setSearchInput("");
+                setPage(1);
+              }}
+              className="shrink-0"
+            >
+              Clear
+            </Button>
+          )}
+        </div>
+        {searchInput && (
+          <p className="mt-2 text-xs text-muted-foreground">
+            {isLoading ? "Searching products..." : "Ready to search"}
+          </p>
+        )}
       </Card>
 
       {isError ? (

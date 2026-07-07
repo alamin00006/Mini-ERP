@@ -27,10 +27,10 @@ router.put(
 )
 
 router.patch(
-  '/:id/deactivate',
+  '/:id/toggle-status',
   auth,
   authorize('user.delete'),
-  UserController.deactivateUser,
+  UserController.toggleUserStatus,
 )
 
 export default router

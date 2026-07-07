@@ -5,38 +5,16 @@ import { generateSKU } from '../../../utils'
 import Product from './product.model'
 import Category from '../category/category.model'
 import type { Multer } from 'multer'
-
-/**
- * Response type for product operations
- */
-type TProductResponse = {
-  _id: string
-  name: string
-  sku: string
-  category: string
-  purchasePrice: number
-  sellingPrice: number
-  stockQuantity: number
-  image: string
-  isDeleted: boolean
-  createdAt: Date
-  updatedAt: Date
-}
+import { TProductPayload, TProductResponse } from './product.interface'
 
 /**
  * Creates a new product with image upload to R2
  * @param payload - Product creation data (name, sku, category, purchasePrice, sellingPrice, stockQuantity, image)
  * @returns Promise<TProductResponse> - Created product data
  */
-const createProduct = async (payload: {
-  name: string
-  sku?: string
-  category: string
-  purchasePrice: number
-  sellingPrice: number
-  stockQuantity: number
-  image: Express.Multer.File
-}): Promise<TProductResponse> => {
+const createProduct = async (
+  payload: TProductPayload,
+): Promise<TProductResponse> => {
   const {
     name,
     sku,
@@ -82,6 +60,7 @@ const createProduct = async (payload: {
     _id: product._id.toString(),
     name: product.name,
     sku: product.sku,
+    categoryId: product.category.toString(),
     category: (populatedProduct as any).category?.name || category,
     purchasePrice: product.purchasePrice,
     sellingPrice: product.sellingPrice,
@@ -147,6 +126,9 @@ const getAllProducts = async (query: {
       _id: product._id.toString(),
       name: product.name,
       sku: product.sku,
+      categoryId:
+        (product as any).category?._id?.toString() ||
+        product.category.toString(),
       category: (product as any).category?.name || 'Unknown',
       purchasePrice: product.purchasePrice,
       sellingPrice: product.sellingPrice,
@@ -183,7 +165,8 @@ const getProductById = async (id: string): Promise<TProductResponse> => {
     _id: product._id.toString(),
     name: product.name,
     sku: product.sku,
-    category: (product as any).category?.name || 'Unknown',
+    categoryId: product.category?._id?.toString(),
+    category: (product as any).category?.name,
     purchasePrice: product.purchasePrice,
     sellingPrice: product.sellingPrice,
     stockQuantity: product.stockQuantity,
@@ -259,6 +242,7 @@ const updateProduct = async (
     _id: updatedProduct!._id.toString(),
     name: updatedProduct!.name,
     sku: updatedProduct!.sku,
+    categoryId: updatedProduct!.category.toString(),
     category: (populatedProduct as any).category?.name || 'Unknown',
     purchasePrice: updatedProduct!.purchasePrice,
     sellingPrice: updatedProduct!.sellingPrice,

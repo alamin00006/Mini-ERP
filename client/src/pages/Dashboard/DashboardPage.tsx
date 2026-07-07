@@ -1,31 +1,41 @@
+import { useEffect } from "react";
 import {
   Package,
   ShoppingCart,
   AlertTriangle,
   PackageCheck,
-  ArrowUpRight,
   RefreshCw,
+  DollarSign,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DataTable, type Column } from "@/components/shared/DataTable";
 import { useGetStatsQuery } from "@/redux";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import type { Product } from "@/types";
 import { cn } from "@/lib/utils";
 import StatCard from "./StatCard";
 
 export default function DashboardPage() {
+  const navigate = useNavigate();
+  const { hasRole } = useAuth();
   const { data, isLoading, isError, refetch, isFetching } = useGetStatsQuery();
+
+  useEffect(() => {
+    if (!hasRole(["Admin"])) {
+      navigate("/products", { replace: true });
+    }
+  }, [hasRole, navigate]);
 
   const dashboardData = data?.data || {
     totalProducts: 0,
     totalSales: 0,
+    totalSaleAmount: 0,
     lowStockCount: 0,
     lowStockProducts: [],
   };
-  console.log(data);
 
   const columns: Column<Product>[] = [
     {
@@ -38,7 +48,6 @@ export default function DashboardPage() {
           </div>
           <div className="min-w-0">
             <div className="truncate font-medium">{r.name}</div>
-            <div className="truncate text-xs text-muted-foreground">{r.category}</div>
           </div>
         </div>
       ),
@@ -83,7 +92,7 @@ export default function DashboardPage() {
         </Button>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Total Products"
           value={dashboardData?.totalProducts}
@@ -99,6 +108,14 @@ export default function DashboardPage() {
           loading={isLoading}
           tone="success"
           hint="All-time orders"
+        />
+        <StatCard
+          label="Total Sale Amount"
+          value={dashboardData?.totalSaleAmount}
+          icon={<DollarSign className="h-5 w-5" />}
+          loading={isLoading}
+          tone="success"
+          hint="Total revenue"
         />
         <StatCard
           label="Low Stock Items"

@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { Pencil, Power, PowerOff, UserPlus } from "lucide-react";
 import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,25 +16,30 @@ import {
 import { DataTable, type Column } from "@/components/shared/DataTable";
 import { RoleBasedGuard } from "@/components/shared/RoleBasedGuard";
 
-// Update role references from lowercase to capitalized
 import {
   useGetUsersQuery,
   useCreateUserMutation,
   useUpdateUserMutation,
-  useDeactivateUserMutation,
+  useToggleUserStatusMutation,
 } from "@/redux";
 import type { User } from "@/types";
 
 const UsersPage = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [formData, setFormData] = useState({ name: "", email: "", password: "", role: "employee" });
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "employee",
+  });
 
   const { data, isLoading, refetch } = useGetUsersQuery();
   const users = data?.data ?? [];
+
   const [createUser, { isLoading: creating }] = useCreateUserMutation();
   const [updateUser, { isLoading: updating }] = useUpdateUserMutation();
-  const [deactivateUser] = useDeactivateUserMutation();
+  const [toggleUserStatus] = useToggleUserStatusMutation();
 
   const openCreate = () => {
     setEditingUser(null);
@@ -42,54 +49,90 @@ const UsersPage = () => {
 
   const openEdit = (user: User) => {
     setEditingUser(user);
-    setFormData({ name: user.name, email: user.email, password: "", role: user.role });
+    setFormData({
+      name: user.name,
+      email: user.email,
+      password: "",
+      role: user.role,
+    });
     setDialogOpen(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     try {
       if (editingUser) {
-        const payload: any = { name: formData.name, email: formData.email, role: formData.role };
-        if (formData.password) payload.password = formData.password;
+        const payload: {
+          name: string;
+          email: string;
+          role: string;
+          password?: string;
+        } = {
+          name: formData.name,
+          email: formData.email,
+          role: formData.role,
+        };
+
+        if (formData.password) {
+          payload.password = formData.password;
+        }
+
         await updateUser({ id: editingUser._id, data: payload }).unwrap();
         toast.success("User updated successfully");
       } else {
         await createUser(formData).unwrap();
         toast.success("User created successfully");
       }
+
       setDialogOpen(false);
-    } catch (e) {
+    } catch {
       toast.error(editingUser ? "Failed to update user" : "Failed to create user");
     }
   };
 
-  const handleDeactivate = async (id: string | number) => {
-    if (!confirm("Are you sure you want to deactivate this user?")) return;
+  const handleToggleStatus = async (id: string | number) => {
     try {
-      await deactivateUser(id).unwrap();
-      toast.success("User deactivated successfully");
+      await toggleUserStatus(id).unwrap();
+      toast.success("User status updated successfully");
       refetch();
-    } catch (e) {
-      toast.error("Failed to deactivate user");
+    } catch {
+      toast.error("Failed to update user status");
     }
   };
 
   const columns: Column<User>[] = [
-    { key: "name", header: "Name", render: (u) => <span className="font-medium">{u.name}</span> },
-    { key: "email", header: "Email", render: (u) => u.email },
+    {
+      key: "name",
+      header: "Name",
+      render: (u) => <span className="font-medium">{u.name}</span>,
+    },
+    {
+      key: "email",
+      header: "Email",
+      render: (u) => u.email,
+    },
     {
       key: "role",
       header: "Role",
-      render: (u) => <span className="capitalize">{u.role}</span>,
+      render: (u) => (
+        <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium capitalize text-primary">
+          {u.role}
+        </span>
+      ),
     },
     {
       key: "status",
       header: "Status",
       render: (u) => (
         <span
-          className={`rounded-full px-2 py-1 text-xs ${u.isActive ? "bg-emerald-500/10 text-emerald-600" : "bg-gray-500/10 text-gray-600"}`}
+          className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${
+            u.isActive ? "bg-emerald-500/10 text-emerald-600" : "bg-slate-500/10 text-slate-600"
+          }`}
         >
+          <span
+            className={`h-1.5 w-1.5 rounded-full ${u.isActive ? "bg-emerald-500" : "bg-slate-400"}`}
+          />
           {u.isActive ? "Active" : "Inactive"}
         </span>
       ),
@@ -100,14 +143,33 @@ const UsersPage = () => {
       className: "text-right",
       render: (u) => (
         <div className="flex justify-end gap-2">
-          <Button variant="ghost" size="sm" onClick={() => openEdit(u)}>
-            Edit
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => openEdit(u)}
+            className="h-8 w-8 rounded-lg text-muted-foreground hover:bg-primary/10 hover:text-primary"
+          >
+            <Pencil className="h-4 w-4" />
           </Button>
-          {u.isActive && (
-            <Button variant="ghost" size="sm" onClick={() => handleDeactivate(u._id)}>
-              Deactivate
-            </Button>
-          )}
+
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => handleToggleStatus(u._id)}
+            className="h-8 px-2 hover:bg-transparent"
+          >
+            <span
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                u.isActive ? "bg-emerald-500" : "bg-slate-300"
+              }`}
+            >
+              <span
+                className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
+                  u.isActive ? "translate-x-5" : "translate-x-1"
+                }`}
+              />
+            </span>
+          </Button>
         </div>
       ),
     },
@@ -115,13 +177,17 @@ const UsersPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-2xl font-semibold">Users</h2>
+          <h2 className="text-2xl font-semibold tracking-tight">Users</h2>
           <p className="text-sm text-muted-foreground">Manage system users and their roles.</p>
         </div>
+
         <RoleBasedGuard roles={["Admin"]}>
-          <Button onClick={openCreate}>Add User</Button>
+          <Button onClick={openCreate}>
+            <UserPlus className="mr-2 h-4 w-4" />
+            Add User
+          </Button>
         </RoleBasedGuard>
       </div>
 
@@ -142,6 +208,7 @@ const UsersPage = () => {
           <DialogHeader>
             <DialogTitle>{editingUser ? "Edit User" : "Create User"}</DialogTitle>
           </DialogHeader>
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label>Name</Label>
@@ -151,6 +218,7 @@ const UsersPage = () => {
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               />
             </div>
+
             <div>
               <Label>Email</Label>
               <Input
@@ -160,6 +228,7 @@ const UsersPage = () => {
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               />
             </div>
+
             <div>
               <Label>Password {editingUser && "(leave blank to keep current)"}</Label>
               <Input
@@ -169,6 +238,7 @@ const UsersPage = () => {
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               />
             </div>
+
             <div>
               <Label>Role</Label>
               <select
@@ -181,10 +251,12 @@ const UsersPage = () => {
                 <option value="employee">Employee</option>
               </select>
             </div>
+
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
                 Cancel
               </Button>
+
               <Button type="submit" disabled={creating || updating}>
                 {creating || updating ? "Saving..." : editingUser ? "Update" : "Create"}
               </Button>

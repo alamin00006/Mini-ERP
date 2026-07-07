@@ -44,6 +44,13 @@ const loginUser = async (payload: {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Password is incorrect')
   }
 
+  if (!user.isActive) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'Your account is inactive. Please contact administrator.',
+    )
+  }
+
   const userRole = await UserRole.findOne({ user: user._id }).populate('role')
   if (!userRole) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'User role not found')

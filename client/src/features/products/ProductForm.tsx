@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,49 +40,75 @@ export const ProductForm = ({
   const { data: categoriesData, isLoading: categoriesLoading } = useGetCategoriesQuery();
   const categories = categoriesData?.data ?? [];
 
+  const form = useForm<ProductFormValues>({
+    resolver: zodResolver(productSchema),
+  });
+
   const {
     register,
     handleSubmit,
     setValue,
-    watch,
     reset,
     formState: { errors },
-  } = useForm<ProductFormValues>({
-    resolver: zodResolver(productSchema),
-  });
+  } = form;
 
-  const categoryValue = watch("category");
+  console.log("ProductForm initial data:", initial);
+  console.log("Categories loaded:", categories);
 
   // Update form values and preview when initial data changes
   useEffect(() => {
     if (!initial || !initial._id) return;
 
     console.log("Setting initial data:", initial);
+    console.log("Initial categoryId:", initial.categoryId);
 
+    // Set basic form values
     reset({
       name: initial.name || "",
-      category: initial.category || "",
       purchasePrice: initial.purchasePrice || 0,
       sellingPrice: initial.sellingPrice || 0,
       stockQuantity: initial.stockQuantity || 0,
     });
 
+    // Set category separately to ensure it's set after categories load
+    if (initial.categoryId) {
+      // Small delay to ensure categories are loaded
+      const timer = setTimeout(() => {
+        setValue("category", initial.categoryId, { shouldValidate: true });
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+
     if (initial.image) {
       setPreview(initial.image);
     }
-  }, [initial, reset]);
+  }, [initial, reset, setValue]);
 
   // Re-set category value when categories load to ensure Select displays it
   useEffect(() => {
-    if (initial?.category && categories.length > 0 && categoryValue !== initial.category) {
-      setValue("category", initial.category, { shouldValidate: true, shouldDirty: false });
+    console.log(
+      "Categories changed:",
+      categories.length,
+      "Initial categoryId:",
+      initial?.categoryId,
+    );
+
+    if (!initial?.categoryId || categories.length === 0) return;
+
+    // Check if the category exists in the loaded categories
+    const categoryExists = categories.some((cat) => cat._id === initial.categoryId);
+    console.log("Category exists in list:", categoryExists);
+
+    if (categoryExists) {
+      console.log("Setting category to:", initial.categoryId);
+      setValue("category", initial.categoryId, { shouldValidate: true });
     }
-  }, [categories, initial?.category, setValue, categoryValue]);
+  }, [categories, initial?.categoryId, setValue]);
 
   // Update preview when initial image changes
   useEffect(() => {
     if (initial?.image) {
-      // Preview is already set from initial?.image in useState
     }
   }, [initial]);
 
@@ -102,6 +128,9 @@ export const ProductForm = ({
     onSubmit(values, imageFile);
   });
 
+  // Get current category value for the Select component
+  const currentCategory = form.watch("category");
+
   return (
     <Card>
       <CardContent className="p-6">
@@ -110,26 +139,34 @@ export const ProductForm = ({
             <Input {...register("name")} placeholder="e.g. Wireless Mouse" />
           </Field>
           <Field label="Category" error={errors.category?.message}>
-            <Select
-              key={categories.length > 0 ? "loaded" : "loading"}
-              value={categoryValue}
-              onValueChange={(value) => setValue("category", value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((cat: Category) => {
-                  const catId = cat._id;
-                  if (!catId) return null;
-                  return (
-                    <SelectItem key={catId} value={catId.toString()}>
-                      {cat.name}
-                    </SelectItem>
-                  );
-                })}
-              </SelectContent>
-            </Select>
+            {categories.length > 0 ? (
+              <Select
+                value={currentCategory}
+                onValueChange={(value) => setValue("category", value, { shouldValidate: true })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((cat: Category) => {
+                    const catId = cat._id;
+                    if (!catId) return null;
+                    return (
+                      <SelectItem key={catId} value={catId}>
+                        {cat.name}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+            ) : (
+              <Select disabled>
+                <SelectTrigger>
+                  <SelectValue placeholder="Loading categories..." />
+                </SelectTrigger>
+                <SelectContent />
+              </Select>
+            )}
           </Field>
           <Field label="Stock Quantity" error={errors.stockQuantity?.message}>
             <Input type="number" min={0} {...register("stockQuantity")} />

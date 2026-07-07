@@ -14,4 +14,6 @@ router.post(
   SaleController.createSale,
 )
 
+router.get('/', auth, authorize('sale.read'), SaleController.getSales)
+
 export default router

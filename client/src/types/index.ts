@@ -12,7 +12,7 @@ export interface LoginResponse {
   success: boolean;
   message: string;
   data: {
-    token: string;
+    accessToken: string;
     user: User;
   };
 }
@@ -21,7 +21,8 @@ export interface Product {
   _id: string;
   name: string;
   sku: string;
-  category: string; // This is the category _id (ObjectId as string)
+  categoryId: string; // Category _id (ObjectId as string)
+  category: string; // Category name
   purchasePrice: number;
   sellingPrice: number;
   stockQuantity: number;
@@ -51,6 +52,7 @@ export interface ProductsListResponse {
 export interface DashboardStats {
   totalProducts: number;
   totalSales: number;
+  totalSaleAmount: number;
   lowStockCount: number;
   lowStockProducts: Product[];
 }

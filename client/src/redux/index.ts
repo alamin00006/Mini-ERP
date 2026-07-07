@@ -10,13 +10,13 @@ export {
   useDeleteProductMutation,
 } from "./api/productApi";
 export { useGetStatsQuery } from "./api/dashboardApi";
-export { useCreateSaleMutation } from "./api/salesApi";
+export { useCreateSaleMutation, useGetSalesQuery } from "./api/salesApi";
 export {
   useGetUsersQuery,
   useGetUserQuery,
   useCreateUserMutation,
   useUpdateUserMutation,
-  useDeactivateUserMutation,
+  useToggleUserStatusMutation,
 } from "./api/usersApi";
 export {
   useGetRolesQuery,

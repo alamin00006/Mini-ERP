@@ -102,23 +102,25 @@ const updateUser = async (
 }
 
 /**
- * Deactivates a user by ID
+ * Toggles user active/inactive status
  * @param req - Express request object with user ID in params
  * @param res - Express response object
  * @param next - Express next middleware function for error handling
  */
-const deactivateUser = async (
+const toggleUserStatus = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
   try {
     const { id } = req.params
-    const result = await UserService.deactivateUser(id)
+    const result = await UserService.toggleUserStatus(id)
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: 'User deactivated successfully',
+      message: result.isActive
+        ? 'User activated successfully'
+        : 'User deactivated successfully',
       data: result,
     })
   } catch (error) {
@@ -131,5 +133,5 @@ export const UserController = {
   getAllUsers,
   getUserById,
   updateUser,
-  deactivateUser,
+  toggleUserStatus,
 }

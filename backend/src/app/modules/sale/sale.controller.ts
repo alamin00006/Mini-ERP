@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import httpStatus from 'http-status'
 import sendResponse from '../../../shared/sendResponse'
 import { SaleService } from './sale.service'
+import Sale from './sale.model'
 
 /**
  * Creates a new sale transaction
@@ -33,6 +34,50 @@ const createSale = async (
   }
 }
 
+/**
+ * Retrieves all sales with pagination
+ * @param req - Express request object
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
+const getSales = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const page = parseInt(req.query.page as string) || 1
+    const limit = parseInt(req.query.limit as string) || 10
+    const skip = (page - 1) * limit
+
+    const [sales, total] = await Promise.all([
+      Sale.find()
+        .populate('createdBy', 'name email')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Sale.countDocuments(),
+    ])
+
+    const totalPages = Math.ceil(total / limit)
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Sales retrieved successfully',
+      data: sales,
+      meta: {
+        page,
+        limit,
+        total,
+      },
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const SaleController = {
   createSale,
+  getSales,
 }

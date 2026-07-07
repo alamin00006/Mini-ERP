@@ -14,6 +14,7 @@ import {
   ChevronRight,
   Folder,
   Bell,
+  ClipboardList,
 } from "lucide-react";
 import { NotificationDropdown } from "@/components/shared/NotificationDropdown";
 import { RoleBasedGuard } from "@/components/shared/RoleBasedGuard";
@@ -42,13 +43,19 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/products", label: "Products", icon: Package },
-  { to: "/categories", label: "Categories", icon: Folder, roles: ["Admin", "Manager"] },
-  { to: "/sales/create", label: "Create Sale", icon: ShoppingCart },
-  { to: "/users", label: "Users", icon: Users, roles: ["Admin", "Manager"] },
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["Admin"] },
+  { to: "/products", label: "Products", icon: Package, roles: ["Admin", "Manager", "Employee"] },
+  { to: "/categories", label: "Categories", icon: Folder, roles: ["Admin"] },
+  {
+    to: "/sales/create",
+    label: "Create Sale",
+    icon: ShoppingCart,
+    roles: ["Admin", "Employee", "Manager"],
+  },
+  { to: "/sales/list", label: "Sales List", icon: ClipboardList, roles: ["Admin"] },
+  { to: "/users", label: "Users", icon: Users, roles: ["Admin"] },
   { to: "/roles", label: "Roles", icon: Shield, roles: ["Admin"] },
-  { to: "/permissions", label: "Permissions", icon: KeyRound, roles: ["Admin"] },
+
   { to: "/notifications", label: "Notifications", icon: Bell, roles: ["Admin"] },
 ];
 
@@ -56,7 +63,7 @@ const STORAGE_KEY = "erp:sidebar:collapsed";
 
 const usePageTitle = (pathname: string) => {
   const match = NAV_ITEMS.find((i) =>
-    i.to === "/dashboard" ? pathname === i.to : pathname.startsWith(i.to),
+    i.to === "/dashboard" ? pathname === i.to : i.to ? pathname.startsWith(i.to) : false,
   );
   if (pathname.startsWith("/products/create")) return "New Product";
   if (pathname.startsWith("/products/edit")) return "Edit Product";
@@ -99,8 +106,28 @@ export function AppLayout({ children }: { children: ReactNode }) {
     navigate("/login", { replace: true });
   };
 
-  const isActive = (to: string) =>
-    to === "/dashboard" ? pathname === to : pathname.startsWith(to);
+  const isActive = (to: string) => {
+    if (to === "/dashboard") return pathname === to;
+    // Exact match always returns true
+    if (pathname === to) return true;
+    // For prefix matches, check if this is the most specific (longest) matching route
+    if (to !== "/" && pathname.startsWith(to + "/")) {
+      // Find all routes that match the current pathname
+      const matchingRoutes = NAV_ITEMS.filter((item) => {
+        if (pathname === item.to) return true;
+        if (item.to !== "/" && pathname.startsWith(item.to + "/")) return true;
+        return false;
+      });
+      // Get the longest matching route (most specific)
+      const longestMatch = matchingRoutes.reduce(
+        (longest, item) => (item.to.length > longest.to.length ? item : longest),
+        matchingRoutes[0],
+      );
+      // Return true only if this route is the longest match
+      return longestMatch.to === to;
+    }
+    return false;
+  };
 
   const initials = (user?.name ?? "U")
     .split(" ")
@@ -282,7 +309,7 @@ const SidebarInner = ({
           const link = (
             <Link
               key={to}
-              to={to}
+              to={to!}
               onClick={onNavigate}
               className={cn(
                 "group relative flex items-center rounded-lg text-sm font-medium transition-all",
@@ -292,7 +319,9 @@ const SidebarInner = ({
                   : "text-muted-foreground hover:bg-muted hover:text-foreground",
               )}
             >
-              <Icon className={cn("h-4 w-4 shrink-0", active && "text-primary-foreground")} />
+              {Icon && (
+                <Icon className={cn("h-4 w-4 shrink-0", active && "text-primary-foreground")} />
+              )}
               {!collapsed && <span className="truncate">{label}</span>}
             </Link>
           );

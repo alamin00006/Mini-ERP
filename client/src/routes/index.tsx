@@ -8,6 +8,7 @@ import ProductsPage from "@/pages/products/ProductsPage";
 import CreateProductPage from "@/pages/products/CreateProductPage";
 import EditProductPage from "@/pages/products/EditProductPage";
 import CreateSalePage from "@/pages/sales/CreateSalePage";
+import SalesListPage from "@/pages/sales/SalesListPage";
 import UsersPage from "@/pages/users/UsersPage";
 import RBACPage from "@/pages/rbac/RBACPage";
 import CategoriesPage from "@/pages/categories/CategoriesPage";
@@ -71,6 +72,14 @@ export const router = createBrowserRouter([
     ),
   },
   {
+    path: "/sales/list",
+    element: (
+      <AuthenticatedLayout>
+        <SalesListPage />
+      </AuthenticatedLayout>
+    ),
+  },
+  {
     path: "/sales/create",
     element: (
       <AuthenticatedLayout>
@@ -94,14 +103,7 @@ export const router = createBrowserRouter([
       </AuthenticatedLayout>
     ),
   },
-  {
-    path: "/permissions",
-    element: (
-      <AuthenticatedLayout>
-        <RBACPage />
-      </AuthenticatedLayout>
-    ),
-  },
+
   {
     path: "/categories",
     element: (
