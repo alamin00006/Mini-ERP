@@ -21,7 +21,7 @@ const product_service_1 = require("./product.service");
  * Creates a new product with image upload
  * @param req - Express request object containing product data and image file
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const createProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -45,7 +45,7 @@ const createProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, func
  * Retrieves all products with pagination, search, and filtering
  * @param req - Express request object with query parameters (page, limit, search, sortBy, sortOrder, category)
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const getAllProducts = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -74,7 +74,7 @@ const getAllProducts = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
  * Retrieves a product by ID
  * @param req - Express request object with product ID in params
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const getProductById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -95,7 +95,7 @@ const getProductById = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
  * Updates a product by ID with optional image upload
  * @param req - Express request object with product ID in params, update data in body, and optional image file
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const updateProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -117,7 +117,7 @@ const updateProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, func
  * Deletes a product by ID (soft delete)
  * @param req - Express request object with product ID in params
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const deleteProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {

@@ -20,7 +20,7 @@ const role_service_1 = require("./role.service");
  * Creates a new role
  * @param req - Express request object containing role data
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const createRole = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -40,7 +40,7 @@ const createRole = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
  * Retrieves all roles
  * @param req - Express request object
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const getAllRoles = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -60,7 +60,7 @@ const getAllRoles = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
  * Retrieves a role by ID
  * @param req - Express request object with role ID in params
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const getRoleById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -81,7 +81,7 @@ const getRoleById = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
  * Updates a role by ID
  * @param req - Express request object with role ID in params and update data in body
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const updateRole = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -102,7 +102,7 @@ const updateRole = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
  * Deactivates a role by ID
  * @param req - Express request object with role ID in params
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const deactivateRole = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -123,7 +123,7 @@ const deactivateRole = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
  * Deletes a role by ID (hard delete)
  * @param req - Express request object with role ID in params
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const deleteRole = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {

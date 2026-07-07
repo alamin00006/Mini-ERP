@@ -20,7 +20,7 @@ const dashboard_service_1 = require("./dashboard.service");
  * Retrieves dashboard statistics
  * @param req - Express request object
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const getDashboardStats = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {

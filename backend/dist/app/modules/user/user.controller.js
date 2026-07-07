@@ -20,7 +20,7 @@ const user_service_1 = require("./user.service");
  * Creates a new user
  * @param req - Express request object containing user data
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const createUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -40,7 +40,7 @@ const createUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
  * Retrieves all users
  * @param req - Express request object
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const getAllUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -60,7 +60,7 @@ const getAllUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
  * Retrieves a user by ID
  * @param req - Express request object with user ID in params
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const getUserById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -81,7 +81,7 @@ const getUserById = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
  * Updates a user by ID
  * @param req - Express request object with user ID in params and update data in body
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -102,7 +102,6 @@ const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
  * Toggles user active/inactive status
  * @param req - Express request object with user ID in params
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
  */
 const toggleUserStatus = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {

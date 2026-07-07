@@ -16,10 +16,7 @@ const server = http.createServer(app)
 // ============================
 // Allowed Origins
 // ============================
-const allowedOrigins = [
-  'https://erpclient.krishokai.xyz',
-  'http://localhost:5173',
-]
+const allowedOrigins = config.allowed_origins
 
 // ============================
 // Middleware

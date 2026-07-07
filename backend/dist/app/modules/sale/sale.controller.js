@@ -21,7 +21,7 @@ const sale_model_1 = __importDefault(require("./sale.model"));
  * Creates a new sale transaction
  * @param req - Express request object containing sale data and user info from auth middleware
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const createSale = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
@@ -44,7 +44,7 @@ const createSale = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
  * Retrieves all sales with pagination
  * @param req - Express request object
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const getSales = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {

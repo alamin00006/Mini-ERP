@@ -20,7 +20,7 @@ const permission_service_1 = require("./permission.service");
  * Creates a new permission
  * @param req - Express request object containing permission data
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const createPermission = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -40,7 +40,7 @@ const createPermission = (req, res, next) => __awaiter(void 0, void 0, void 0, f
  * Retrieves all permissions
  * @param req - Express request object
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const getAllPermissions = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -60,7 +60,7 @@ const getAllPermissions = (req, res, next) => __awaiter(void 0, void 0, void 0, 
  * Retrieves a permission by ID
  * @param req - Express request object with permission ID in params
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const getPermissionById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -81,7 +81,7 @@ const getPermissionById = (req, res, next) => __awaiter(void 0, void 0, void 0, 
  * Updates a permission by ID
  * @param req - Express request object with permission ID in params and update data in body
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const updatePermission = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -102,7 +102,7 @@ const updatePermission = (req, res, next) => __awaiter(void 0, void 0, void 0, f
  * Deletes a permission by ID
  * @param req - Express request object with permission ID in params
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const deletePermission = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {

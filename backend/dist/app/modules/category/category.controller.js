@@ -20,7 +20,7 @@ const category_service_1 = require("./category.service");
  * Creates a new category
  * @param req - Express request object containing category data
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const createCategory = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -40,7 +40,7 @@ const createCategory = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
  * Retrieves all categories
  * @param req - Express request object
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const getAllCategories = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -60,7 +60,7 @@ const getAllCategories = (req, res, next) => __awaiter(void 0, void 0, void 0, f
  * Retrieves a category by ID
  * @param req - Express request object with category ID in params
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const getCategoryById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -81,7 +81,7 @@ const getCategoryById = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
  * Updates a category by ID
  * @param req - Express request object with category ID in params and update data in body
  * @param res - Express response object
- * @param next - Express next middleware function for error handling
+  
  */
 const updateCategory = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
