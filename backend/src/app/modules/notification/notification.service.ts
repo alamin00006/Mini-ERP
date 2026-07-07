@@ -38,15 +38,20 @@ const createNotification = async (notificationPayload: any) => {
 }
 
 const getNotification = async (payload: any) => {
+  // Default to Admin role if no roles provided
+  const roles = payload?.roles || [ENUM_USER_ROLE.ADMIN]
+
   let query = {
-    status: 'unread',
-    roles: { $in: payload.roles },
+    // status: 'unread',
+    roles: { $in: roles },
   } as any
 
-  const role = payload.roles.includes('User')
+  // Check if User role is in the array
+  const hasUserRole =
+    roles.includes('User') || roles.includes(ENUM_USER_ROLE.ADMIN)
 
-  if (role) {
-    query.user = payload?.userId
+  if (hasUserRole && payload?.userId) {
+    query.user = payload.userId
   }
   const notifications = await Notification.find(query).sort({ timestamp: -1 })
 
