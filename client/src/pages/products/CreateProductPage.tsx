@@ -29,10 +29,10 @@ const CreateProductPage = () => {
 
     try {
       await createProduct(formData).unwrap();
-      toast.success("Product created");
+      toast.success("Product created successfully");
       navigate("/products");
-    } catch (error) {
-      toast.error("Failed to create product");
+    } catch (error: any) {
+      toast.error(error.data.message || "Failed to create product");
     }
   };
 

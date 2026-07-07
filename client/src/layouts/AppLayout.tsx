@@ -20,7 +20,7 @@ import { logout } from "@/redux/slices/authSlice";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { getUserInitials } from "@/utils/user";
-import { NAV_ITEMS, type NavItem } from "@/layouts/navigation";
+import { NAV_ITEMS } from "@/layouts/navigation";
 
 const STORAGE_KEY = "erp:sidebar:collapsed";
 

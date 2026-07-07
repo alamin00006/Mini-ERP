@@ -15,7 +15,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Pagination } from "@/components/shared/Pagination";
 import { getProductColumns } from "@/pages/products/productColumns";
 
-export default function ProductsPage() {
+const ProductsPage = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState<number>(10);
   const [search, setSearch] = useState("");
@@ -50,8 +50,8 @@ export default function ProductsPage() {
       await deleteProduct(id).unwrap();
       toast.success("Product deleted");
       setToDelete(null);
-    } catch (e) {
-      toast.error("Failed to delete");
+    } catch (error: any) {
+      toast.error(error.data.message || "Failed to delete");
     }
   };
 
@@ -144,4 +144,5 @@ export default function ProductsPage() {
       />
     </div>
   );
-}
+};
+export default ProductsPage;

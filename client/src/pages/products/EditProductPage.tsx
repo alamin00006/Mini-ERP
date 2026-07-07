@@ -34,8 +34,8 @@ export default function EditProductPage() {
       await updateProduct({ id, form: formData }).unwrap();
       toast.success("Product updated");
       navigate("/products");
-    } catch (e) {
-      toast.error("Failed to update product");
+    } catch (error: any) {
+      toast.error(error.data.message || "Failed to update product");
     }
   };
 
