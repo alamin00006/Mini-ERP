@@ -4,12 +4,19 @@ import {
   LayoutDashboard,
   Package,
   ShoppingCart,
+  Users,
+  Shield,
+  KeyRound,
   LogOut,
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
   ChevronRight,
+  Folder,
+  Bell,
 } from "lucide-react";
+import { NotificationDropdown } from "@/components/shared/NotificationDropdown";
+import { RoleBasedGuard } from "@/components/shared/RoleBasedGuard";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -27,11 +34,23 @@ import { logout } from "@/redux/slices/authSlice";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-const NAV_ITEMS = [
+interface NavItem {
+  to: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  roles?: string[];
+}
+
+const NAV_ITEMS: NavItem[] = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/products", label: "Products", icon: Package },
+  { to: "/categories", label: "Categories", icon: Folder, roles: ["Admin", "Manager"] },
   { to: "/sales/create", label: "Create Sale", icon: ShoppingCart },
-] as const;
+  { to: "/users", label: "Users", icon: Users, roles: ["Admin", "Manager"] },
+  { to: "/roles", label: "Roles", icon: Shield, roles: ["Admin"] },
+  { to: "/permissions", label: "Permissions", icon: KeyRound, roles: ["Admin"] },
+  { to: "/notifications", label: "Notifications", icon: Bell, roles: ["Admin"] },
+];
 
 const STORAGE_KEY = "erp:sidebar:collapsed";
 
@@ -42,6 +61,18 @@ const usePageTitle = (pathname: string) => {
   if (pathname.startsWith("/products/create")) return "New Product";
   if (pathname.startsWith("/products/edit")) return "Edit Product";
   return match?.label ?? "Overview";
+};
+
+const useAuthRole = () => {
+  if (typeof window === "undefined") return null;
+  try {
+    const userRaw = window.localStorage.getItem("erp_user");
+    if (!userRaw) return null;
+    const user = JSON.parse(userRaw);
+    return user?.role ?? null;
+  } catch {
+    return null;
+  }
 };
 
 export function AppLayout({ children }: { children: ReactNode }) {
@@ -56,6 +87,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const pathname = location.pathname;
   const pageTitle = usePageTitle(pathname);
+  const userRole = useAuthRole();
 
   useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, collapsed ? "1" : "0");
@@ -92,6 +124,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             isActive={isActive}
             onNavigate={() => {}}
             onLogout={handleLogout}
+            userRole={userRole}
           />
         </aside>
 
@@ -107,6 +140,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 setMobileOpen(false);
                 handleLogout();
               }}
+              userRole={userRole}
             />
           </SheetContent>
         </Sheet>
@@ -154,6 +188,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
               </nav>
               <h1 className="truncate text-base font-semibold sm:hidden">{pageTitle}</h1>
             </div>
+
+            <RoleBasedGuard roles={["Admin"]}>
+              <NotificationDropdown />
+            </RoleBasedGuard>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -206,11 +244,13 @@ const SidebarInner = ({
   isActive,
   onNavigate,
   onLogout,
+  userRole,
 }: {
   collapsed: boolean;
   isActive: (to: string) => boolean;
   onNavigate: () => void;
   onLogout: () => void;
+  userRole: string | null;
 }) => {
   return (
     <>
@@ -236,7 +276,8 @@ const SidebarInner = ({
             Workspace
           </p>
         )}
-        {NAV_ITEMS.map(({ to, label, icon: Icon }) => {
+        {NAV_ITEMS.map(({ to, label, icon: Icon, roles }) => {
+          if (roles && userRole && !roles.includes(userRole)) return null;
           const active = isActive(to);
           const link = (
             <Link

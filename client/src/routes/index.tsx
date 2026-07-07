@@ -1,12 +1,17 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { ProtectedRoute } from "@/components/shared/ProtectedRoute";
-import LoginPage from "@/pages/LoginPage";
-import DashboardPage from "@/pages/DashboardPage";
-import ProductsPage from "@/pages/ProductsPage";
-import CreateProductPage from "@/pages/CreateProductPage";
-import EditProductPage from "@/pages/EditProductPage";
-import CreateSalePage from "@/pages/CreateSalePage";
+import { RoleBasedGuard } from "@/components/shared/RoleBasedGuard";
+import LoginPage from "@/pages/login/LoginPage";
+import DashboardPage from "@/pages/Dashboard/DashboardPage";
+import ProductsPage from "@/pages/products/ProductsPage";
+import CreateProductPage from "@/pages/products/CreateProductPage";
+import EditProductPage from "@/pages/products/EditProductPage";
+import CreateSalePage from "@/pages/sales/CreateSalePage";
+import UsersPage from "@/pages/users/UsersPage";
+import RBACPage from "@/pages/rbac/RBACPage";
+import CategoriesPage from "@/pages/categories/CategoriesPage";
+import NotificationsPage from "@/pages/notifications/NotificationsPage";
 
 const AuthenticatedLayout = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -70,6 +75,48 @@ export const router = createBrowserRouter([
     element: (
       <AuthenticatedLayout>
         <CreateSalePage />
+      </AuthenticatedLayout>
+    ),
+  },
+  {
+    path: "/users",
+    element: (
+      <AuthenticatedLayout>
+        <UsersPage />
+      </AuthenticatedLayout>
+    ),
+  },
+  {
+    path: "/roles",
+    element: (
+      <AuthenticatedLayout>
+        <RBACPage />
+      </AuthenticatedLayout>
+    ),
+  },
+  {
+    path: "/permissions",
+    element: (
+      <AuthenticatedLayout>
+        <RBACPage />
+      </AuthenticatedLayout>
+    ),
+  },
+  {
+    path: "/categories",
+    element: (
+      <AuthenticatedLayout>
+        <CategoriesPage />
+      </AuthenticatedLayout>
+    ),
+  },
+  {
+    path: "/notifications",
+    element: (
+      <AuthenticatedLayout>
+        <RoleBasedGuard roles={["Admin"]}>
+          <NotificationsPage />
+        </RoleBasedGuard>
       </AuthenticatedLayout>
     ),
   },

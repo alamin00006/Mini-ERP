@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Plus, Pencil, Trash2, Search, ImageIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -17,15 +17,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { DataTable, type Column } from "@/components/shared/DataTable";
 import { RoleBasedGuard } from "@/components/shared/RoleBasedGuard";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useGetProductsQuery, useDeleteProductMutation } from "@/redux";
-import type { Product } from "@/types";
+import { useGetProductsQuery, useDeleteProductMutation, useGetCategoriesQuery } from "@/redux";
+import type { Product, Category } from "@/types";
+import { useAuth } from "@/hooks/useAuth";
+import { Pagination } from "@/components/shared/Pagination";
 
 const PAGE_SIZE_OPTIONS = [5, 10, 20, 50, 100] as const;
 
@@ -37,6 +32,10 @@ export default function ProductsPage() {
   const [searchInput, setSearchInput] = useState("");
   const [toDelete, setToDelete] = useState<Product | null>(null);
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  // Debug: Log user role
+  console.log("Current user role:", user?.role);
 
   const { data, isLoading, isError, refetch } = useGetProductsQuery({
     page,
@@ -44,9 +43,18 @@ export default function ProductsPage() {
     search,
   });
 
+  const { data: categoriesData } = useGetCategoriesQuery();
+  const categories = categoriesData?.data ?? [];
+
   const [deleteProduct] = useDeleteProductMutation();
 
   const products = data?.data ?? [];
+
+  // Helper function to get category name by _id
+  const getCategoryName = (categoryId: string) => {
+    const category = categories.find((cat: Category) => cat._id === categoryId);
+    return category?.name || categoryId;
+  };
   const total = data?.meta?.total ?? 0;
   const totalPages = data?.meta?.totalPages ?? 1;
 
@@ -66,7 +74,11 @@ export default function ProductsPage() {
     },
     { key: "name", header: "Name", render: (p) => <span className="font-medium">{p.name}</span> },
     { key: "sku", header: "SKU", render: (p) => p.sku },
-    { key: "category", header: "Category", render: (p) => p.category },
+    {
+      key: "category",
+      header: "Category",
+      render: (p) => getCategoryName(p.category),
+    },
     { key: "purchase", header: "Purchase", render: (p) => `$${p.purchasePrice.toFixed(2)}` },
     { key: "selling", header: "Selling", render: (p) => `$${p.sellingPrice.toFixed(2)}` },
     {
@@ -84,17 +96,19 @@ export default function ProductsPage() {
       className: "w-32 text-right",
       render: (p) => (
         <div className="flex justify-end gap-1">
-          <RoleBasedGuard roles={["admin", "manager"]}>
+          <RoleBasedGuard roles={["Admin", "Manager"]}>
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => navigate(`/products/edit/${p.id}`)}
+              onClick={() => {
+                navigate(`/products/edit/${p._id}`);
+              }}
               aria-label="Edit"
             >
               <Pencil className="h-4 w-4" />
             </Button>
           </RoleBasedGuard>
-          <RoleBasedGuard roles={["admin"]}>
+          <RoleBasedGuard roles={["Admin"]}>
             <Button variant="ghost" size="icon" onClick={() => setToDelete(p)} aria-label="Delete">
               <Trash2 className="h-4 w-4 text-destructive" />
             </Button>
@@ -128,7 +142,7 @@ export default function ProductsPage() {
           <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Products</h2>
           <p className="mt-1 text-sm text-muted-foreground">Manage your inventory catalogue.</p>
         </div>
-        <RoleBasedGuard roles={["admin", "manager"]}>
+        <RoleBasedGuard roles={["Admin", "Manager"]}>
           <Button onClick={() => navigate("/products/create")} className="shrink-0">
             <Plus className="mr-2 h-4 w-4" /> Add Product
           </Button>
@@ -185,83 +199,20 @@ export default function ProductsPage() {
             rows={products}
             loading={isLoading}
             emptyMessage="No products yet."
-            rowKey={(p) => p.id}
+            rowKey={(p) => p._id}
           />
-          <div className="flex flex-col gap-3 rounded-lg border bg-card px-4 py-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-            <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-              <span>Rows per page:</span>
-              <Select
-                value={
-                  PAGE_SIZE_OPTIONS.includes(pageSize as (typeof PAGE_SIZE_OPTIONS)[number])
-                    ? String(pageSize)
-                    : "custom"
-                }
-                onValueChange={(v) => {
-                  if (v === "custom") return;
-                  setPageSize(Number(v));
-                  setPageSizeInput(v);
-                  setPage(1);
-                }}
-              >
-                <SelectTrigger className="h-8 w-[84px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {PAGE_SIZE_OPTIONS.map((n) => (
-                    <SelectItem key={n} value={String(n)}>
-                      {n}
-                    </SelectItem>
-                  ))}
-                  <SelectItem value="custom" disabled>
-                    Custom
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              <Input
-                type="number"
-                min={1}
-                max={500}
-                value={pageSizeInput}
-                onChange={(e) => setPageSizeInput(e.target.value)}
-                onBlur={() => applyPageSize(pageSizeInput)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    applyPageSize(pageSizeInput);
-                  }
-                }}
-                className="h-8 w-20"
-                aria-label="Custom rows per page"
-              />
-            </div>
 
-            <p className="text-sm text-muted-foreground">
-              Page <span className="font-medium text-foreground">{page}</span> of{" "}
-              <span className="font-medium text-foreground">{totalPages}</span> ·{" "}
-              <span className="font-medium text-foreground">{total}</span> total
-            </p>
-
-            <div className="flex gap-2 sm:ml-auto">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={page <= 1}
-                onClick={() => setPage((p) => p - 1)}
-                className="flex-1 sm:flex-none"
-              >
-                Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={page >= totalPages}
-                onClick={() => setPage((p) => p + 1)}
-                className="flex-1 sm:flex-none"
-              >
-                Next
-              </Button>
-            </div>
-          </div>
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            total={total}
+            pageSize={pageSize}
+            onPageChange={setPage}
+            onPageSizeChange={(size) => {
+              setPageSize(size);
+              setPage(1);
+            }}
+          />
         </>
       )}
 
@@ -275,7 +226,7 @@ export default function ProductsPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => toDelete && handleDelete(toDelete.id)}>
+            <AlertDialogAction onClick={() => toDelete && handleDelete(toDelete._id)}>
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>

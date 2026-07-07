@@ -5,8 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { productSchema, type ProductFormValues } from "./productSchema";
-import type { Product } from "@/types";
+import type { Product, Category } from "@/types";
+import { useGetCategoriesQuery } from "@/redux";
 
 interface Props {
   initial?: Product;
@@ -27,32 +35,56 @@ export const ProductForm = ({
 }: Props) => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
-  const [preview, setPreview] = useState<string | null>(initial?.image ?? null);
+  const [preview, setPreview] = useState<string | null>(null);
+
+  const { data: categoriesData, isLoading: categoriesLoading } = useGetCategoriesQuery();
+  const categories = categoriesData?.data ?? [];
 
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
+    reset,
     formState: { errors },
   } = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
-    defaultValues: initial
-      ? {
-          name: initial.name,
-          sku: initial.sku,
-          category: initial.category,
-          purchasePrice: initial.purchasePrice,
-          sellingPrice: initial.sellingPrice,
-          stockQuantity: initial.stockQuantity,
-        }
-      : {
-          name: "",
-          sku: "",
-          category: "",
-          purchasePrice: 0,
-          sellingPrice: 0,
-          stockQuantity: 0,
-        },
   });
+
+  const categoryValue = watch("category");
+
+  // Update form values and preview when initial data changes
+  useEffect(() => {
+    if (!initial || !initial._id) return;
+
+    console.log("Setting initial data:", initial);
+
+    reset({
+      name: initial.name || "",
+      category: initial.category || "",
+      purchasePrice: initial.purchasePrice || 0,
+      sellingPrice: initial.sellingPrice || 0,
+      stockQuantity: initial.stockQuantity || 0,
+    });
+
+    if (initial.image) {
+      setPreview(initial.image);
+    }
+  }, [initial, reset]);
+
+  // Re-set category value when categories load to ensure Select displays it
+  useEffect(() => {
+    if (initial?.category && categories.length > 0 && categoryValue !== initial.category) {
+      setValue("category", initial.category, { shouldValidate: true, shouldDirty: false });
+    }
+  }, [categories, initial?.category, setValue, categoryValue]);
+
+  // Update preview when initial image changes
+  useEffect(() => {
+    if (initial?.image) {
+      // Preview is already set from initial?.image in useState
+    }
+  }, [initial]);
 
   useEffect(() => {
     if (!imageFile) return;
@@ -77,11 +109,27 @@ export const ProductForm = ({
           <Field label="Product Name" error={errors.name?.message}>
             <Input {...register("name")} placeholder="e.g. Wireless Mouse" />
           </Field>
-          <Field label="SKU" error={errors.sku?.message}>
-            <Input {...register("sku")} placeholder="e.g. WM-001" />
-          </Field>
           <Field label="Category" error={errors.category?.message}>
-            <Input {...register("category")} placeholder="e.g. Electronics" />
+            <Select
+              key={categories.length > 0 ? "loaded" : "loading"}
+              value={categoryValue}
+              onValueChange={(value) => setValue("category", value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((cat: Category) => {
+                  const catId = cat._id;
+                  if (!catId) return null;
+                  return (
+                    <SelectItem key={catId} value={catId.toString()}>
+                      {cat.name}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
           </Field>
           <Field label="Stock Quantity" error={errors.stockQuantity?.message}>
             <Input type="number" min={0} {...register("stockQuantity")} />

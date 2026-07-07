@@ -14,9 +14,18 @@ import { DataTable, type Column } from "@/components/shared/DataTable";
 import { useGetStatsQuery } from "@/redux";
 import type { Product } from "@/types";
 import { cn } from "@/lib/utils";
+import StatCard from "./StatCard";
 
 export default function DashboardPage() {
   const { data, isLoading, isError, refetch, isFetching } = useGetStatsQuery();
+
+  const dashboardData = data?.data || {
+    totalProducts: 0,
+    totalSales: 0,
+    lowStockCount: 0,
+    lowStockProducts: [],
+  };
+  console.log(data);
 
   const columns: Column<Product>[] = [
     {
@@ -77,7 +86,7 @@ export default function DashboardPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard
           label="Total Products"
-          value={data?.totalProducts}
+          value={dashboardData?.totalProducts}
           icon={<Package className="h-5 w-5" />}
           loading={isLoading}
           tone="primary"
@@ -85,7 +94,7 @@ export default function DashboardPage() {
         />
         <StatCard
           label="Total Sales"
-          value={data?.totalSales}
+          value={dashboardData?.totalSales}
           icon={<ShoppingCart className="h-5 w-5" />}
           loading={isLoading}
           tone="success"
@@ -93,7 +102,7 @@ export default function DashboardPage() {
         />
         <StatCard
           label="Low Stock Items"
-          value={data?.lowStockCount}
+          value={dashboardData?.lowStockCount}
           icon={<AlertTriangle className="h-5 w-5" />}
           loading={isLoading}
           tone="danger"
@@ -109,10 +118,10 @@ export default function DashboardPage() {
               Products with less than 5 units in stock.
             </p>
           </div>
-          {data?.lowStockProducts?.length ? (
+          {dashboardData?.lowStockProducts?.length ? (
             <Badge variant="secondary" className="gap-1">
               <AlertTriangle className="h-3 w-3" />
-              {data.lowStockProducts.length} needs attention
+              {dashboardData.lowStockProducts.length} needs attention
             </Badge>
           ) : null}
         </div>
@@ -134,7 +143,7 @@ export default function DashboardPage() {
               </Button>
             </CardContent>
           </Card>
-        ) : !isLoading && (data?.lowStockProducts?.length ?? 0) === 0 ? (
+        ) : !isLoading && (dashboardData?.lowStockProducts?.length ?? 0) === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center gap-3 py-14 text-center">
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
@@ -151,83 +160,13 @@ export default function DashboardPage() {
         ) : (
           <DataTable
             columns={columns}
-            rows={data?.lowStockProducts ?? []}
+            rows={dashboardData?.lowStockProducts ?? []}
             loading={isLoading}
             emptyMessage="No low stock products."
-            rowKey={(r) => r.id}
+            rowKey={(r) => r._id}
           />
         )}
       </section>
     </div>
   );
 }
-
-const TONE_STYLES = {
-  primary: {
-    icon: "bg-primary/10 text-primary",
-    accent: "text-primary",
-  },
-  success: {
-    icon: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-    accent: "text-emerald-600 dark:text-emerald-400",
-  },
-  danger: {
-    icon: "bg-destructive/10 text-destructive",
-    accent: "text-destructive",
-  },
-} as const;
-
-const StatCard = ({
-  label,
-  value,
-  icon,
-  loading,
-  tone = "primary",
-  hint,
-}: {
-  label: string;
-  value: number | undefined;
-  icon: React.ReactNode;
-  loading?: boolean;
-  tone?: keyof typeof TONE_STYLES;
-  hint?: string;
-}) => {
-  const styles = TONE_STYLES[tone];
-  return (
-    <Card className="relative overflow-hidden transition-shadow hover:shadow-md">
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <p className="text-sm font-medium text-muted-foreground">{label}</p>
-            {loading ? (
-              <Skeleton className="mt-3 h-9 w-20" />
-            ) : (
-              <p
-                className={cn(
-                  "mt-2 text-3xl font-semibold tracking-tight",
-                  tone === "danger" && styles.accent,
-                )}
-              >
-                {(value ?? 0).toLocaleString()}
-              </p>
-            )}
-            {hint && (
-              <p className="mt-1 text-xs text-muted-foreground">
-                <ArrowUpRight className="mr-1 inline h-3 w-3" />
-                {hint}
-              </p>
-            )}
-          </div>
-          <div
-            className={cn(
-              "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl",
-              styles.icon,
-            )}
-          >
-            {icon}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-};

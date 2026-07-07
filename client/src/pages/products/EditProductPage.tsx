@@ -14,7 +14,7 @@ export default function EditProductPage() {
   const [updateProduct] = useUpdateProductMutation();
 
   useEffect(() => {
-    if (hydrated && !hasRole(["admin", "manager"])) {
+    if (hydrated && !hasRole(["Admin", "Manager"])) {
       toast.error("You don't have permission to edit products");
       navigate("/products", { replace: true });
     }
@@ -23,7 +23,6 @@ export default function EditProductPage() {
   const handleSubmit = async (values: any, image: File | null) => {
     const fd = new FormData();
     fd.append("name", values.name);
-    fd.append("sku", values.sku);
     fd.append("category", values.category);
     fd.append("purchasePrice", String(values.purchasePrice));
     fd.append("sellingPrice", String(values.sellingPrice));
@@ -53,7 +52,7 @@ export default function EditProductPage() {
         </div>
       ) : (
         <ProductForm
-          initial={data}
+          initial={data.data}
           requireImage={false}
           submitLabel="Update Product"
           onCancel={() => navigate("/products")}

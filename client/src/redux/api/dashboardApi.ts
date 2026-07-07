@@ -1,25 +1,10 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import type { DashboardStats } from "@/types";
-import { getBaseUrl } from "@/config/envConfig";
+import { baseApi } from "./baseApi";
+import type { DashboardResponse } from "@/types";
 
-export const dashboardApi = createApi({
-  reducerPath: "dashboardApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: getBaseUrl(),
-    prepareHeaders: (headers) => {
-      if (typeof window !== "undefined") {
-        const token = window.localStorage.getItem("erp_token");
-        if (token) {
-          headers.set("Authorization", `Bearer ${token}`);
-        }
-      }
-      return headers;
-    },
-  }),
-  tagTypes: ["Dashboard"],
+export const dashboardApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
-    getStats: build.query<DashboardStats, void>({
-      query: () => "/dashboard/stats",
+    getStats: build.query<DashboardResponse, void>({
+      query: () => ({ url: "/dashboard", method: "GET" }),
       providesTags: ["Dashboard"],
     }),
   }),

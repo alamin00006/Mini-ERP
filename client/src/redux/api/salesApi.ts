@@ -1,28 +1,13 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { baseApi } from "./baseApi";
 import type { SalePayload } from "@/types";
-import { getBaseUrl } from "@/config/envConfig";
 
-export const salesApi = createApi({
-  reducerPath: "salesApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: getBaseUrl(),
-    prepareHeaders: (headers) => {
-      if (typeof window !== "undefined") {
-        const token = window.localStorage.getItem("erp_token");
-        if (token) {
-          headers.set("Authorization", `Bearer ${token}`);
-        }
-      }
-      return headers;
-    },
-  }),
-  tagTypes: ["Sales", "Dashboard"],
+export const salesApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     createSale: build.mutation<{ id: string | number }, SalePayload>({
       query: (payload) => ({
-        url: "/api/sales",
+        url: "/sales",
         method: "POST",
-        body: payload,
+        data: payload,
       }),
       invalidatesTags: ["Sales", "Dashboard"],
     }),
