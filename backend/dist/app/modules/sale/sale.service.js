@@ -18,6 +18,8 @@ const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const product_model_1 = __importDefault(require("../product/product.model"));
 const sale_model_1 = __importDefault(require("./sale.model"));
+const notification_service_1 = require("../notification/notification.service");
+const role_1 = require("../../../enums/role");
 /**
  * Creates a new sale transaction with stock management
  * Uses MongoDB transaction to ensure data consistency
@@ -25,7 +27,7 @@ const sale_model_1 = __importDefault(require("./sale.model"));
  * @returns Promise<TSaleResponse> - Created sale data
  */
 const createSale = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const { products, createdBy } = payload;
+    const { products, createdBy, io } = payload;
     if (!products || products.length === 0) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'At least one product is required');
     }
@@ -65,6 +67,15 @@ const createSale = (payload) => __awaiter(void 0, void 0, void 0, function* () {
         ], { session });
         yield session.commitTransaction();
         session.endSession();
+        // Create notification for new sale
+        if (io) {
+            yield notification_service_1.NotificationService.createNotification({
+                message: `New sale created with grand total: ${grandTotal}`,
+                roles: [role_1.ENUM_USER_ROLE.ADMIN, role_1.ENUM_USER_ROLE.MANAGER],
+                type: 'general',
+                io,
+            });
+        }
         return {
             _id: sale[0]._id.toString(),
             products: saleProducts,

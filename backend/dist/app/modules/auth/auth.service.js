@@ -35,6 +35,9 @@ const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     if (!isPasswordMatched) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Password is incorrect');
     }
+    if (!user.isActive) {
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Your account is inactive. Please contact administrator.');
+    }
     const userRole = yield userRole_model_1.default.findOne({ user: user._id }).populate('role');
     if (!userRole) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'User role not found');

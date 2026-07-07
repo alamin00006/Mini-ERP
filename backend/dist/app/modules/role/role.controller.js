@@ -119,10 +119,32 @@ const deactivateRole = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         next(error);
     }
 });
+/**
+ * Deletes a role by ID (hard delete)
+ * @param req - Express request object with role ID in params
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
+const deleteRole = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const result = yield role_service_1.RoleService.deleteRole(id);
+        (0, sendResponse_1.default)(res, {
+            statusCode: http_status_1.default.OK,
+            success: true,
+            message: result.message,
+            data: null,
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+});
 exports.RoleController = {
     createRole,
     getAllRoles,
     getRoleById,
     updateRole,
     deactivateRole,
+    deleteRole,
 };

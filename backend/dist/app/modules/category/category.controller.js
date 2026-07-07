@@ -98,30 +98,9 @@ const updateCategory = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         next(error);
     }
 });
-/**
- * Deletes a category by ID (soft delete)
- * @param req - Express request object with category ID in params
- * @param res - Express response object
- * @param next - Express next middleware function for error handling
- */
-const deleteCategory = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { id } = req.params;
-        yield category_service_1.CategoryService.deleteCategory(id);
-        (0, sendResponse_1.default)(res, {
-            statusCode: http_status_1.default.OK,
-            success: true,
-            message: 'Category deleted successfully',
-        });
-    }
-    catch (error) {
-        next(error);
-    }
-});
 exports.CategoryController = {
     createCategory,
     getAllCategories,
     getCategoryById,
     updateCategory,
-    deleteCategory,
 };

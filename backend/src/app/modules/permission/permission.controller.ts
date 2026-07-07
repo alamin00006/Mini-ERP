@@ -64,7 +64,7 @@ const getPermissionById = async (
 ): Promise<void> => {
   try {
     const { id } = req.params
-    const result = await PermissionService.getPermissionById(id)
+    const result = await PermissionService.getPermissionById(id as string)
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
@@ -89,7 +89,10 @@ const updatePermission = async (
 ): Promise<void> => {
   try {
     const { id } = req.params
-    const result = await PermissionService.updatePermission(id, req.body)
+    const result = await PermissionService.updatePermission(
+      id as string,
+      req.body,
+    )
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
@@ -114,7 +117,7 @@ const deletePermission = async (
 ): Promise<void> => {
   try {
     const { id } = req.params
-    await PermissionService.deletePermission(id)
+    await PermissionService.deletePermission(id as string)
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,

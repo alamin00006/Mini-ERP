@@ -41,7 +41,9 @@ const getNotification = catchAsync(async (req, res) => {
 const updateNotification = catchAsync(async (req, res) => {
   const id = req.params.id
 
-  const notifications = await NotificationService.updateNotification(id)
+  const notifications = await NotificationService.updateNotification(
+    id as string,
+  )
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

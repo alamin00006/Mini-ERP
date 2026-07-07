@@ -13,5 +13,4 @@ router.post('/', auth_1.auth, (0, auth_1.authorize)('category.create'), (0, vali
 router.get('/', auth_1.auth, (0, auth_1.authorize)('category.read'), category_controller_1.CategoryController.getAllCategories);
 router.get('/:id', auth_1.auth, (0, auth_1.authorize)('category.read'), category_controller_1.CategoryController.getCategoryById);
 router.put('/:id', auth_1.auth, (0, auth_1.authorize)('category.update'), (0, validateRequest_1.default)(category_validation_1.updateCategoryValidation), category_controller_1.CategoryController.updateCategory);
-router.patch('/:id/delete', auth_1.auth, (0, auth_1.authorize)('category.delete'), category_controller_1.CategoryController.deleteCategory);
 exports.default = router;

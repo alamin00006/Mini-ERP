@@ -10,4 +10,5 @@ const sale_validation_1 = require("./sale.validation");
 const auth_1 = require("../../middlewares/auth");
 const router = (0, express_1.Router)();
 router.post('/', auth_1.auth, (0, auth_1.authorize)('sale.create'), (0, validateRequest_1.default)(sale_validation_1.createSaleValidation), sale_controller_1.SaleController.createSale);
+router.get('/', auth_1.auth, (0, auth_1.authorize)('sale.read'), sale_controller_1.SaleController.getSales);
 exports.default = router;

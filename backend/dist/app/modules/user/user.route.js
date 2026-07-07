@@ -13,5 +13,5 @@ router.post('/', auth_1.auth, (0, auth_1.authorize)('user.create'), (0, validate
 router.get('/', auth_1.auth, (0, auth_1.authorize)('user.read'), user_controller_1.UserController.getAllUsers);
 router.get('/:id', auth_1.auth, (0, auth_1.authorize)('user.read'), user_controller_1.UserController.getUserById);
 router.put('/:id', auth_1.auth, (0, auth_1.authorize)('user.update'), (0, validateRequest_1.default)(user_validation_1.updateUserValidation), user_controller_1.UserController.updateUser);
-router.patch('/:id/deactivate', auth_1.auth, (0, auth_1.authorize)('user.delete'), user_controller_1.UserController.deactivateUser);
+router.patch('/:id/toggle-status', auth_1.auth, (0, auth_1.authorize)('user.delete'), user_controller_1.UserController.toggleUserStatus);
 exports.default = router;

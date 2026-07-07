@@ -16,6 +16,7 @@ exports.SaleController = void 0;
 const http_status_1 = __importDefault(require("http-status"));
 const sendResponse_1 = __importDefault(require("../../../shared/sendResponse"));
 const sale_service_1 = require("./sale.service");
+const sale_model_1 = __importDefault(require("./sale.model"));
 /**
  * Creates a new sale transaction
  * @param req - Express request object containing sale data and user info from auth middleware
@@ -26,7 +27,8 @@ const createSale = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     var _a;
     try {
         const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
-        const result = yield sale_service_1.SaleService.createSale(Object.assign(Object.assign({}, req.body), { createdBy: userId }));
+        const io = req.app.get('socketio');
+        const result = yield sale_service_1.SaleService.createSale(Object.assign(Object.assign({}, req.body), { createdBy: userId, io }));
         (0, sendResponse_1.default)(res, {
             statusCode: http_status_1.default.CREATED,
             success: true,
@@ -38,6 +40,43 @@ const createSale = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         next(error);
     }
 });
+/**
+ * Retrieves all sales with pagination
+ * @param req - Express request object
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
+const getSales = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+        const [sales, total] = yield Promise.all([
+            sale_model_1.default.find()
+                .populate('createdBy', 'name email')
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit),
+            sale_model_1.default.countDocuments(),
+        ]);
+        const totalPages = Math.ceil(total / limit);
+        (0, sendResponse_1.default)(res, {
+            statusCode: http_status_1.default.OK,
+            success: true,
+            message: 'Sales retrieved successfully',
+            data: sales,
+            meta: {
+                page,
+                limit,
+                total,
+            },
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+});
 exports.SaleController = {
     createSale,
+    getSales,
 };

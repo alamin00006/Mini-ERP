@@ -14,4 +14,5 @@ router.get('/', auth_1.auth, (0, auth_1.authorize)('role.read'), role_controller
 router.get('/:id', auth_1.auth, (0, auth_1.authorize)('role.read'), role_controller_1.RoleController.getRoleById);
 router.put('/:id', auth_1.auth, (0, auth_1.authorize)('role.update'), (0, validateRequest_1.default)(role_validation_1.updateRoleValidation), role_controller_1.RoleController.updateRole);
 router.patch('/:id/deactivate', auth_1.auth, (0, auth_1.authorize)('role.delete'), role_controller_1.RoleController.deactivateRole);
+router.delete('/:id', auth_1.auth, (0, auth_1.authorize)('role.delete'), role_controller_1.RoleController.deleteRole);
 exports.default = router;

@@ -37,14 +37,6 @@ const product_model_1 = __importDefault(require("./app/modules/product/product.m
 const sale_model_1 = __importDefault(require("./app/modules/sale/sale.model"));
 dotenv_1.default.config();
 const defaultPermissions = [
-    // Auth permissions
-    {
-        key: 'auth.login',
-        name: 'Login',
-        description: 'User login',
-        group: 'Auth',
-        module: 'Auth',
-    },
     // User permissions
     {
         key: 'user.create',
@@ -212,6 +204,14 @@ const defaultPermissions = [
         description: 'View dashboard',
         group: 'Dashboard',
         module: 'Dashboard',
+    },
+    // Notification permissions
+    {
+        key: 'notification.read',
+        name: 'Read Notifications',
+        description: 'View notification history',
+        group: 'Notification',
+        module: 'Notification',
     },
 ];
 const defaultRoles = [

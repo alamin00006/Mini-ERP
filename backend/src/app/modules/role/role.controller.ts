@@ -64,7 +64,7 @@ const getRoleById = async (
 ): Promise<void> => {
   try {
     const { id } = req.params
-    const result = await RoleService.getRoleById(id)
+    const result = await RoleService.getRoleById(id as string)
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
@@ -89,7 +89,7 @@ const updateRole = async (
 ): Promise<void> => {
   try {
     const { id } = req.params
-    const result = await RoleService.updateRole(id, req.body)
+    const result = await RoleService.updateRole(id as string, req.body)
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
@@ -114,7 +114,7 @@ const deactivateRole = async (
 ): Promise<void> => {
   try {
     const { id } = req.params
-    const result = await RoleService.deactivateRole(id)
+    const result = await RoleService.deactivateRole(id as string)
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
@@ -139,7 +139,7 @@ const deleteRole = async (
 ): Promise<void> => {
   try {
     const { id } = req.params
-    const result = await RoleService.deleteRole(id)
+    const result = await RoleService.deleteRole(id as string)
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,

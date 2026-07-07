@@ -102,21 +102,9 @@ const updateCategory = (id, payload) => __awaiter(void 0, void 0, void 0, functi
         updatedAt: updatedCategory.updatedAt,
     };
 });
-/**
- * Deletes a category by ID (soft delete)
- * @param id - Category ID to delete
- */
-const deleteCategory = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const category = yield category_model_1.default.findById(id);
-    if (!category) {
-        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'Category not found');
-    }
-    yield category_model_1.default.findByIdAndUpdate(id, { isActive: false });
-});
 exports.CategoryService = {
     createCategory,
     getAllCategories,
     getCategoryById,
     updateCategory,
-    deleteCategory,
 };

@@ -82,7 +82,7 @@ const getProductById = async (
 ): Promise<void> => {
   try {
     const { id } = req.params
-    const result = await ProductService.getProductById(id)
+    const result = await ProductService.getProductById(id as string)
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
@@ -108,7 +108,11 @@ const updateProduct = async (
   try {
     const { id } = req.params
     const file = req.file
-    const result = await ProductService.updateProduct(id, req.body, file)
+    const result = await ProductService.updateProduct(
+      id as string,
+      req.body,
+      file,
+    )
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
@@ -133,7 +137,7 @@ const deleteProduct = async (
 ): Promise<void> => {
   try {
     const { id } = req.params
-    await ProductService.deleteProduct(id)
+    await ProductService.deleteProduct(id as string)
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,

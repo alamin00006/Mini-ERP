@@ -12,6 +12,7 @@ const category_route_1 = __importDefault(require("../modules/category/category.r
 const product_route_1 = __importDefault(require("../modules/product/product.route"));
 const sale_route_1 = __importDefault(require("../modules/sale/sale.route"));
 const dashboard_route_1 = __importDefault(require("../modules/dashboard/dashboard.route"));
+const notification_route_1 = require("../modules/notification/notification.route");
 const router = express_1.default.Router();
 const moduleRoutes = [
     {
@@ -45,6 +46,10 @@ const moduleRoutes = [
     {
         path: '/dashboard',
         route: dashboard_route_1.default,
+    },
+    {
+        path: '/notifications',
+        route: notification_route_1.notificationRoutes,
     },
 ];
 moduleRoutes.forEach(route => router.use(route.path, route.route));

@@ -51,6 +51,7 @@ const createProduct = (payload) => __awaiter(void 0, void 0, void 0, function* (
         _id: product._id.toString(),
         name: product.name,
         sku: product.sku,
+        categoryId: product.category.toString(),
         category: ((_a = populatedProduct.category) === null || _a === void 0 ? void 0 : _a.name) || category,
         purchasePrice: product.purchasePrice,
         sellingPrice: product.sellingPrice,
@@ -93,12 +94,14 @@ const getAllProducts = (query) => __awaiter(void 0, void 0, void 0, function* ()
     const totalPages = Math.ceil(total / limit);
     return {
         data: data.map(product => {
-            var _a;
+            var _a, _b, _c;
             return ({
                 _id: product._id.toString(),
                 name: product.name,
                 sku: product.sku,
-                category: ((_a = product.category) === null || _a === void 0 ? void 0 : _a.name) || 'Unknown',
+                categoryId: ((_b = (_a = product.category) === null || _a === void 0 ? void 0 : _a._id) === null || _b === void 0 ? void 0 : _b.toString()) ||
+                    product.category.toString(),
+                category: ((_c = product.category) === null || _c === void 0 ? void 0 : _c.name) || 'Unknown',
                 purchasePrice: product.purchasePrice,
                 sellingPrice: product.sellingPrice,
                 stockQuantity: product.stockQuantity,
@@ -122,7 +125,7 @@ const getAllProducts = (query) => __awaiter(void 0, void 0, void 0, function* ()
  * @returns Promise<TProductResponse> - Product data
  */
 const getProductById = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+    var _a, _b, _c;
     const product = yield product_model_1.default.findOne({ _id: id, isDeleted: false }).populate('category');
     if (!product) {
         throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'Product not found');
@@ -131,7 +134,8 @@ const getProductById = (id) => __awaiter(void 0, void 0, void 0, function* () {
         _id: product._id.toString(),
         name: product.name,
         sku: product.sku,
-        category: ((_a = product.category) === null || _a === void 0 ? void 0 : _a.name) || 'Unknown',
+        categoryId: (_b = (_a = product.category) === null || _a === void 0 ? void 0 : _a._id) === null || _b === void 0 ? void 0 : _b.toString(),
+        category: (_c = product.category) === null || _c === void 0 ? void 0 : _c.name,
         purchasePrice: product.purchasePrice,
         sellingPrice: product.sellingPrice,
         stockQuantity: product.stockQuantity,
@@ -182,6 +186,7 @@ const updateProduct = (id, payload, image) => __awaiter(void 0, void 0, void 0, 
         _id: updatedProduct._id.toString(),
         name: updatedProduct.name,
         sku: updatedProduct.sku,
+        categoryId: updatedProduct.category.toString(),
         category: ((_a = populatedProduct.category) === null || _a === void 0 ? void 0 : _a.name) || 'Unknown',
         purchasePrice: updatedProduct.purchasePrice,
         sellingPrice: updatedProduct.sellingPrice,

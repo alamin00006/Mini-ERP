@@ -65,7 +65,7 @@ const getCategoryById = async (
 ): Promise<void> => {
   try {
     const { id } = req.params
-    const result = await CategoryService.getCategoryById(id)
+    const result = await CategoryService.getCategoryById(id as string)
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
@@ -90,7 +90,7 @@ const updateCategory = async (
 ): Promise<void> => {
   try {
     const { id } = req.params
-    const result = await CategoryService.updateCategory(id, req.body)
+    const result = await CategoryService.updateCategory(id as string, req.body)
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,

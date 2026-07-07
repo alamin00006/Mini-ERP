@@ -203,10 +203,32 @@ const deactivateRole = (id) => __awaiter(void 0, void 0, void 0, function* () {
         updatedAt: deactivatedRole.updatedAt,
     };
 });
+/**
+ * Deletes a role by ID (hard delete)
+ * @param id - Role ID to delete
+ * @returns Promise<{ message: string }> - Success message
+ */
+const deleteRole = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const role = yield role_model_1.default.findById(id);
+    if (!role) {
+        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'Role not found');
+    }
+    if (role.isSystem) {
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Cannot delete system role');
+    }
+    // Delete associated role-permission mappings
+    yield rolePermission_model_1.default.deleteMany({ role: id });
+    // Delete the role
+    yield role_model_1.default.findByIdAndDelete(id);
+    return {
+        message: 'Role deleted successfully',
+    };
+});
 exports.RoleService = {
     createRole,
     getAllRoles,
     getRoleById,
     updateRole,
     deactivateRole,
+    deleteRole,
 };

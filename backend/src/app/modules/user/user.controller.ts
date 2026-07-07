@@ -64,7 +64,7 @@ const getUserById = async (
 ): Promise<void> => {
   try {
     const { id } = req.params
-    const result = await UserService.getUserById(id)
+    const result = await UserService.getUserById(id as string)
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
@@ -89,7 +89,7 @@ const updateUser = async (
 ): Promise<void> => {
   try {
     const { id } = req.params
-    const result = await UserService.updateUser(id, req.body)
+    const result = await UserService.updateUser(id as string, req.body)
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
@@ -114,7 +114,7 @@ const toggleUserStatus = async (
 ): Promise<void> => {
   try {
     const { id } = req.params
-    const result = await UserService.toggleUserStatus(id)
+    const result = await UserService.toggleUserStatus(id as string)
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,

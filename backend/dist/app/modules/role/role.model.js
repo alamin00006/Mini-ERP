@@ -16,6 +16,10 @@ const roleSchema = new mongoose_1.Schema({
         type: Boolean,
         default: false,
     },
+    isActive: {
+        type: Boolean,
+        default: true,
+    },
 }, {
     timestamps: true,
 });
@@ -25,7 +29,5 @@ roleSchema.virtual('rolePermissions', {
     localField: '_id',
     foreignField: 'role',
 });
-// NOTE: `strictPopulate` option type may not be available in the current Mongoose typings.
-// Virtuals can still be populated via `populate()`.
 const Role = (0, mongoose_1.model)('Role', roleSchema);
 exports.default = Role;

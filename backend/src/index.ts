@@ -117,7 +117,7 @@ const io = new Server(server, {
 app.set('socketio', io)
 
 io.on('connection', socket => {
-  socket.on('join_room', room => {
+  socket.on('join_room', (room: string) => {
     socket.join(room)
   })
 

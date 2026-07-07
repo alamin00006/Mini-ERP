@@ -36,7 +36,9 @@ const createUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
         email,
         password: hashedPassword,
     });
-    const roleDoc = yield role_model_1.default.findOne({ name: role });
+    const roleDoc = yield role_model_1.default.findOne({
+        name: { $regex: new RegExp(`^${role}$`, 'i') },
+    });
     if (!roleDoc) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Role not found');
     }
@@ -135,7 +137,9 @@ const updateUser = (id, payload) => __awaiter(void 0, void 0, void 0, function* 
     }
     const updatedUser = yield user_model_1.default.findByIdAndUpdate(id, payload, { new: true });
     if (payload.role) {
-        const roleDoc = yield role_model_1.default.findOne({ name: payload.role });
+        const roleDoc = yield role_model_1.default.findOne({
+            name: { $regex: new RegExp(`^${payload.role}$`, 'i') },
+        });
         if (roleDoc) {
             yield userRole_model_1.default.findOneAndUpdate({ user: id }, { role: roleDoc._id }, { new: true, upsert: true });
         }
@@ -152,26 +156,26 @@ const updateUser = (id, payload) => __awaiter(void 0, void 0, void 0, function* 
     };
 });
 /**
- * Deactivates a user by ID (soft delete)
- * @param id - User ID to deactivate
- * @returns Promise<TUserResponse> - Deactivated user data
+ * Toggles user active/inactive status
+ * @param id - User ID to toggle
+ * @returns Promise<TUserResponse> - Updated user data
  */
-const deactivateUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
+const toggleUserStatus = (id) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const user = yield user_model_1.default.findById(id);
     if (!user) {
         throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User not found');
     }
-    const deactivatedUser = yield user_model_1.default.findByIdAndUpdate(id, { isActive: false }, { new: true });
+    const updatedUser = yield user_model_1.default.findByIdAndUpdate(id, { isActive: !user.isActive }, { new: true });
     const userRole = yield userRole_model_1.default.findOne({ user: id }).populate('role');
     return {
-        _id: deactivatedUser._id.toString(),
-        name: deactivatedUser.name,
-        email: deactivatedUser.email,
+        _id: updatedUser._id.toString(),
+        name: updatedUser.name,
+        email: updatedUser.email,
         role: ((_a = userRole === null || userRole === void 0 ? void 0 : userRole.role) === null || _a === void 0 ? void 0 : _a.name) || 'No Role',
-        isActive: deactivatedUser.isActive,
-        createdAt: deactivatedUser.createdAt,
-        updatedAt: deactivatedUser.updatedAt,
+        isActive: updatedUser.isActive,
+        createdAt: updatedUser.createdAt,
+        updatedAt: updatedUser.updatedAt,
     };
 });
 exports.UserService = {
@@ -179,5 +183,5 @@ exports.UserService = {
     getAllUsers,
     getUserById,
     updateUser,
-    deactivateUser,
+    toggleUserStatus,
 };

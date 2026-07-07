@@ -9,6 +9,7 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const cors_1 = __importDefault(require("cors"));
 const http_1 = __importDefault(require("http"));
 const http_status_1 = __importDefault(require("http-status"));
+const socket_io_1 = require("socket.io");
 const index_1 = __importDefault(require("./app/routes/index"));
 const globalErrorHandler_1 = __importDefault(require("./errors/globalErrorHandler"));
 const multer_1 = require("./app/middlewares/multer");
@@ -93,6 +94,27 @@ process.on('SIGTERM', () => {
             process.exit(0);
         });
     }
+});
+// ============================
+// Socket.IO setup
+// ============================
+const io = new socket_io_1.Server(server, {
+    cors: {
+        origin: allowedOrigins,
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+        allowedHeaders: ['Content-Type', 'x-api-key', 'Authorization'],
+    },
+    transports: ['websocket', 'polling'],
+});
+app.set('socketio', io);
+io.on('connection', socket => {
+    socket.on('join_room', (room) => {
+        socket.join(room);
+    });
+    socket.on('disconnect', () => {
+        // console.log('Client disconnected')
+    });
 });
 // ============================
 // Start Server
