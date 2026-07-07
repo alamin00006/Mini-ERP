@@ -1,7 +1,5 @@
 # Mini ERP System
 
-A full-stack Enterprise Resource Planning (ERP) system built with modern web technologies. Features role-based access control, real-time notifications, and comprehensive business management tools.
-
 ---
 
 # Live Demo
@@ -23,9 +21,7 @@ A full-stack Enterprise Resource Planning (ERP) system built with modern web tec
 ## Dashboard
 
 - Real-time business statistics and analytics
-- Sales overview and metrics
-- Product inventory status
-- User activity tracking
+- Sales overview
 
 ## Product Management
 
@@ -39,14 +35,12 @@ A full-stack Enterprise Resource Planning (ERP) system built with modern web tec
 
 - Organize products into categories
 - CRUD operations for categories
-- Category-based product filtering
 
 ## User Management
 
-- User registration and profile management
+- User create
 - Role assignment (Admin, Manager, Employee)
 - User status toggle (active/inactive)
-- User listing with search and pagination
 
 ## Sales Management
 
@@ -83,7 +77,7 @@ A full-stack Enterprise Resource Planning (ERP) system built with modern web tec
 - **Routing:** React Router DOM v7
 - **Styling:** Tailwind CSS v4
 - **UI Components:** Radix UI, ShadCN
-- **Forms:** React Hook Form v7 with Zod resolver for type-safe validation
+- **Forms:** React Hook Form with Zod resolver for type-safe validation
 - **Real-time:** Socket.io Client
 - **HTTP Client:** Axios
 - **Icons:** Lucide React
@@ -128,113 +122,6 @@ A full-stack Enterprise Resource Planning (ERP) system built with modern web tec
 
 ---
 
-# Folder Structure
-
-```
-Mini-ERP/
-├── backend/
-│   ├── src/
-│   │   ├── app/
-│   │   │   ├── middlewares/
-│   │   │   │   ├── auth.ts              # JWT authentication middleware
-│   │   │   │   ├── multer.ts            # File upload middleware
-│   │   │   │   └── validateRequest.ts   # Request validation middleware
-│   │   │   ├── modules/
-│   │   │   │   ├── auth/                # Authentication module
-│   │   │   │   ├── user/                # User management
-│   │   │   │   ├── role/                # Role management
-│   │   │   │   ├── permission/          # Permission management
-│   │   │   │   ├── product/             # Product management
-│   │   │   │   ├── category/            # Category management
-│   │   │   │   ├── sale/                # Sales management
-│   │   │   │   ├── dashboard/           # Dashboard statistics
-│   │   │   │   └── notification/        # Notifications
-│   │   │   └── routes/
-│   │   │       └── index.ts             # Route aggregator
-│   │   ├── config/
-│   │   │   └── index.ts                 # App configuration
-│   │   ├── enums/
-│   │   │   └── role.ts                  # User role enums
-│   │   ├── errors/
-│   │   │   ├── ApiError.ts
-│   │   │   ├── globalErrorHandler.ts
-│   │   │   └── handle*.ts               # Error handlers
-│   │   ├── helpers/
-│   │   │   ├── dbConnect.ts
-│   │   │   ├── jwtHelpers.ts
-│   │   │   ├── passwordHelpers.ts
-│   │   │   └── r2Upload.ts
-│   │   ├── shared/
-│   │   │   ├── AppError.ts
-│   │   │   ├── catchAsync.ts
-│   │   │   ├── QueryBuilder.ts
-│   │   │   └── sendResponse.ts
-│   │   ├── utils/
-│   │   │   └── index.ts
-│   │   ├── index.ts                     # App entry point
-│   │   └── seed.ts                      # Database seeder
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── .env.example
-│
-└── client/
-    ├── src/
-    │   ├── api/
-    │   │   └── endpoints.ts
-    │   ├── components/
-    │   │   ├── layout/
-    │   │   │   └── AppLayout.tsx
-    │   │   └── shared/
-    │   │       ├── ProtectedRoute.tsx
-    │   │       └── RoleBasedGuard.tsx
-    │   ├── config/
-    │   │   └── envConfig.ts
-    │   ├── features/
-    │   │   └── products/
-    │   │       └── ProductForm.tsx
-    │   ├── hooks/
-    │   │   └── useSocket.ts
-    │   ├── pages/
-    │   │   ├── Dashboard/
-    │   │   │   └── DashboardPage.tsx
-    │   │   ├── products/
-    │   │   │   ├── ProductsPage.tsx
-    │   │   │   ├── CreateProductPage.tsx
-    │   │   │   └── EditProductPage.tsx
-    │   │   ├── sales/
-    │   │   │   ├── SalesListPage.tsx
-    │   │   │   └── CreateSalePage.tsx
-    │   │   ├── users/
-    │   │   │   └── UsersPage.tsx
-    │   │   ├── rbac/
-    │   │   │   └── RBACPage.tsx
-    │   │   ├── categories/
-    │   │   │   └── CategoriesPage.tsx
-    │   │   ├── notifications/
-    │   │   │   └── NotificationsPage.tsx
-    │   │   └── login/
-    │   │       └── LoginPage.tsx
-    │   ├── redux/
-    │   │   ├── api/
-    │   │   │   ├── baseApi.ts
-    │   │   │   ├── usersApi.ts
-    │   │   │   ├── salesApi.ts
-    │   │   │   └── notificationsApi.ts
-    │   │   └── index.ts
-    │   ├── routes/
-    │   │   └── index.tsx
-    │   ├── types/
-    │   │   └── index.ts
-    │   ├── App.tsx
-    │   ├── main.tsx
-    │   └── styles.css
-    ├── package.json
-    ├── tsconfig.json
-    └── vite.config.ts
-```
-
----
-
 # Installation
 
 ## Prerequisites
@@ -242,7 +129,7 @@ Mini-ERP/
 - Node.js (v18 or higher)
 - MongoDB Atlas account or local MongoDB instance
 - Cloudflare R2 account (for image storage)
-- npm or yarn
+- npm
 
 ## Backend Setup
 
@@ -277,8 +164,6 @@ cd client
 # Install dependencies
 npm install
 
-# Create environment file
-cp .env.example .env
 
 # Configure environment variables (see Environment Variables section)
 
@@ -302,30 +187,36 @@ npm run preview
 # Server Configuration
 PORT=5000
 
-# Database
-DATABASE_URL=mongodb+srv://<username>:<password>@cluster0.mongodb.net/mini-erp?retryWrites=true&w=majority
+DATABASE_URL=mongodb+srv://Alamin:ZnEUylHANPiysG7L@cluster0.scp6egc.mongodb.net/mini-erp?retryWrites=true&w=majority
 
-# Authentication
 BCRYPT_SALT_ROUNDS=12
-ACCESS_TOKEN_SECRET=<your-secret-key>
-JWT_EXPIRES_IN=7d
+ACCESS_TOKEN_SECRET=super_secret_key
+REFRESH_TOKEN_SECRET=super_refresh_secret_key
+JWT_EXPIRES_IN=5s
+REFRESH_TOKEN_EXPIRES_IN=30d
 
-# Cloudflare R2 Storage
-R2_ACCOUNT_ID=<your-account-id>
-R2_BUCKET_NAME=<your-bucket-name>
-R2_ACCESS_KEY_ID=<your-access-key>
-R2_SECRET_ACCESS_KEY=<your-secret-key>
-R2_ENDPOINT=https://<account-id>.r2.cloudflarestorage.com
-R2_PUBLIC_URL=https://<bucket-name>.r2.dev
+# Cloudflare R2
+R2_ACCOUNT_ID=1d1068d87ceebb37e6fdf3117db5e7cf
+R2_BUCKET_NAME=alamin
 
-# CORS
-ALLOWED_ORIGINS=https://your-frontend-domain.com,http://localhost:5173
+R2_ACCESS_KEY_ID=ad958e6f2ac18f0ef6a0a76a6a6843c0
+R2_SECRET_ACCESS_KEY=6bc9bfe6cf995cdffc656520ed578eb74d826e551adf5deffd3d2caf9c7e0b19
+
+R2_ENDPOINT=https://1d1068d87ceebb37e6fdf3117db5e7cf.r2.cloudflarestorage.com
+R2_PUBLIC_URL=https://pub-90e1143646384f89b5066855ab6946af.r2.dev
+
+ALLOWED_ORIGINS=https://erpclient.krishokai.xyz,http://localhost:5173
+
+# Cookie settings
+COOKIE_SECURE=false
+COOKIE_HTTP_ONLY=true
+COOKIE_SAME_SITE=lax
 ```
 
 ## Frontend (.env)
 
 ```env
-VITE_API_URL=https://your-backend-api-url.com
+VITE_API_BASE_URL=http://localhost:5000/api/v1
 ```
 
 ---
@@ -336,362 +227,10 @@ VITE_API_URL=https://your-backend-api-url.com
 
 Import the Postman collection to explore and test all API endpoints:
 
-**Postman Collection:** [Mini_ERP_API_Collection.postman_collection.json](./Mini_ERP_API_Collection.postman_collection.json)
+**Postman Collection:** [postman_documentation.json](./postman_documentation.json)
 
 ### Base URL
 
 ```
-https://erp-server-krishokai.vercel.app/api/v1
-```
-
-### Authentication Endpoints
-
-#### Login
 
 ```
-POST /auth/login
-Content-Type: application/json
-
-{
-  "email": "user@example.com",
-  "password": "password123"
-}
-```
-
-**Response:**
-
-```json
-{
-  "success": true,
-  "statusCode": 200,
-  "data": {
-    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-  }
-}
-```
-
-### User Endpoints
-
-| Method | Endpoint                   | Description        | Permission  |
-| ------ | -------------------------- | ------------------ | ----------- |
-| POST   | `/users`                   | Create user        | user.create |
-| GET    | `/users`                   | Get all users      | user.read   |
-| GET    | `/users/:id`               | Get user by ID     | user.read   |
-| PUT    | `/users/:id`               | Update user        | user.update |
-| PATCH  | `/users/:id/toggle-status` | Toggle user status | user.delete |
-
-### Product Endpoints
-
-| Method | Endpoint               | Description                 | Permission     |
-| ------ | ---------------------- | --------------------------- | -------------- |
-| POST   | `/products`            | Create product (with image) | product.create |
-| GET    | `/products`            | Get all products            | product.read   |
-| GET    | `/products/:id`        | Get product by ID           | product.read   |
-| PUT    | `/products/:id`        | Update product (with image) | product.update |
-| PATCH  | `/products/:id/delete` | Soft delete product         | product.delete |
-
-### Category Endpoints
-
-| Method | Endpoint          | Description        | Permission      |
-| ------ | ----------------- | ------------------ | --------------- |
-| POST   | `/categories`     | Create category    | category.create |
-| GET    | `/categories`     | Get all categories | category.read   |
-| GET    | `/categories/:id` | Get category by ID | category.read   |
-| PUT    | `/categories/:id` | Update category    | category.update |
-
-### Sale Endpoints
-
-| Method | Endpoint | Description   | Permission  |
-| ------ | -------- | ------------- | ----------- |
-| POST   | `/sales` | Create sale   | sale.create |
-| GET    | `/sales` | Get all sales | sale.read   |
-
-### Dashboard Endpoints
-
-| Method | Endpoint     | Description              | Permission     |
-| ------ | ------------ | ------------------------ | -------------- |
-| GET    | `/dashboard` | Get dashboard statistics | dashboard.read |
-
-### Notification Endpoints
-
-| Method | Endpoint                  | Description                    |
-| ------ | ------------------------- | ------------------------------ |
-| GET    | `/notifications`          | Get user notifications         |
-| PATCH  | `/notifications/:id/read` | Mark notification as read      |
-| PATCH  | `/notifications/read-all` | Mark all notifications as read |
-
----
-
-# User Roles
-
-## Admin
-
-**Full system access with all permissions.**
-
-- Manage all users (create, update, delete, toggle status)
-- Manage roles and permissions
-- Create and manage products with image upload
-- Manage categories
-- Create and view sales
-- Access dashboard statistics
-- View and manage notifications
-- Configure system settings
-
-## Manager
-
-**Operational management with limited administrative access.**
-
-- Create and manage products
-- Manage categories
-- Create and view sales
-- Access dashboard statistics
-- View notifications
-- Manage employees (limited user management)
-
-## Employee
-
-**Basic operational access.**
-
-- View products
-- Create sales
-- View dashboard (limited)
-- View notifications
-
----
-
-# Default Admin Credentials
-
-**Note:** These are placeholder credentials. Change them immediately after first login.
-
-```
-Email: admin@minierp.com
-Password: Admin@123
-```
-
----
-
-# Available Scripts
-
-## Backend Scripts
-
-```bash
-npm run dev          # Start development server with hot reload (ts-node-dev)
-npm run clean        # Clean build directory
-npm run build        # Build TypeScript to JavaScript
-npm run start        # Start production server
-npm run lint:check   # Check code with ESLint
-npm run lint:fix     # Fix ESLint errors automatically
-npm run prettier:check  # Check code formatting
-npm run prettier:fix    # Format code with Prettier
-npm run lint:prettier   # Run both lint and prettier checks
-npm run seed:jobs    # Seed database with initial data
-```
-
-## Frontend Scripts
-
-```bash
-npm run dev          # Start development server (Vite)
-npm run build        # Build for production
-npm run build:dev    # Build in development mode
-npm run preview      # Preview production build locally
-npm run lint         # Check code with ESLint
-npm run format       # Format code with Prettier
-```
-
----
-
-# Production Build
-
-## Backend
-
-```bash
-# Build the TypeScript project
-npm run build
-
-# This creates a dist/ folder with compiled JavaScript
-# Start the production server
-npm run start
-```
-
-## Frontend
-
-```bash
-# Build the React application
-npm run build
-
-# This creates a dist/ folder with optimized static files
-# Deploy the dist/ folder to your hosting service
-```
-
----
-
-# Deployment
-
-## Frontend (Vercel)
-
-1. Push your code to GitHub
-2. Import project in Vercel
-3. Set environment variables:
-   - `VITE_API_URL` = Your backend API URL
-4. Deploy automatically on every push
-
-## Backend (Vercel)
-
-1. Push your code to GitHub
-2. Import project in Vercel
-3. Set environment variables (see Environment Variables section)
-4. Vercel will automatically detect and deploy the Express app
-
-## MongoDB (MongoDB Atlas)
-
-1. Create a MongoDB Atlas account
-2. Create a new cluster
-3. Get your connection string
-4. Add it to backend `.env` as `DATABASE_URL`
-5. Configure network access (IP whitelist)
-6. Create database user with appropriate permissions
-
-## Cloudflare R2
-
-1. Create a Cloudflare account
-2. Navigate to R2 section
-3. Create a new bucket
-4. Generate API credentials (Access Key ID and Secret Access Key)
-5. Configure CORS settings for your domain
-6. Add R2 credentials to backend `.env`
-7. Set up custom domain for public URL (optional)
-
----
-
-# Key Features Implementation
-
-## Authentication Flow
-
-1. User logs in with email and password
-2. Backend validates credentials and generates JWT tokens
-3. Access token stored in localStorage
-4. Refresh token used to get new access tokens when expired
-5. Protected routes check for valid token before rendering
-
-## Role-Based Access Control
-
-1. Each user is assigned a role (Admin, Manager, Employee)
-2. Permissions are defined for each role
-3. Backend middleware checks permissions before allowing access
-4. Frontend guards hide/show UI elements based on user role
-5. API endpoints return 403 Forbidden if user lacks permission
-
-## Form Validation
-
-- React Hook Form used for all form handling (e.g., ProductForm)
-- Zod schema validation integrated via `zodResolver`
-- Type-safe form values with TypeScript inference
-- Real-time error messages displayed to users
-- Form state management with `register`, `handleSubmit`, `setValue`, `reset`
-- Image file handling with preview before upload
-
-## Image Upload
-
-1. User selects image file in product form
-2. Multer middleware handles multipart/form-data
-3. Image uploaded to Cloudflare R2 storage
-4. Public URL returned and stored in database
-5. Image displayed using CDN URL for fast loading
-
-## Real-time Notifications
-
-1. Socket.io server running on backend
-2. Client connects via Socket.io client
-3. **Trigger:** When a new sale is created, automatic notification is generated
-4. **Recipients:** Notifications are sent to Admin and Manager roles via Socket.io
-5. Client receives and displays notifications in real-time
-6. Notifications persisted in database for history
-7. **Access Control:** Only Admin users can view the notifications page (protected by RoleBasedGuard)
-
----
-
-# Development
-
-## Code Style
-
-- TypeScript for type safety
-- ESLint for code linting
-- Prettier for code formatting
-- Conventional commits recommended
-
-## Architecture
-
-- Modular architecture with feature-based organization
-- Separation of concerns (controllers, services, models)
-- Middleware for cross-cutting concerns
-- Global error handling
-- Consistent API response format
-
-## Database Schema
-
-- User model with role references
-- Role and Permission models for RBAC
-- Product model with image URL and category reference
-- Category model for product organization
-- Sale model with product and user references
-- Notification model for real-time alerts
-
----
-
-# Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
-# Author
-
-**Alamin**
-
-- GitHub: [@alamin00006](https://github.com/alamin00006)
-- LinkedIn: [Alamin](https://www.linkedin.com/in/alamin00006/)
-
----
-
-# License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-# Support
-
-For support, email alamin@example.com or create an issue in the GitHub repository.
-
----
-
-# Roadmap
-
-- [ ] Add inventory management with low-stock alerts
-- [ ] Implement barcode scanning for products
-- [ ] Add advanced reporting and analytics
-- [ ] Export data to PDF/Excel
-- [ ] Multi-language support
-- [ ] Dark mode toggle
-- [ ] Mobile app (React Native)
-- [ ] Email notifications
-- [ ] Advanced search with filters
-- [ ] Bulk import/export products
-
----
-
-# Acknowledgments
-
-- [Express.js](https://expressjs.com/) - Backend framework
-- [React](https://react.dev/) - Frontend library
-- [MongoDB](https://www.mongodb.com/) - Database
-- [Tailwind CSS](https://tailwindcss.com/) - Styling
-- [Redux Toolkit](https://redux-toolkit.js.org/) - State management
-- [Cloudflare R2](https://www.cloudflare.com/developer-platform/r2/) - Object storage
-- [Socket.io](https://socket.io/) - Real-time communication
-
