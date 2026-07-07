@@ -12,7 +12,10 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { DataTable, type Column } from "@/components/shared/DataTable";
-import { RoleBasedGuard } from "@/components/shared/RoleBasedGuard";
+import { PermissionGuard } from "@/components/shared/PermissionGuard";
+import { PageHeader } from "@/components/shared/PageHeader";
+import { StatusBadge } from "@/components/shared/StatusBadge";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 // Update role references to match backend (capitalized)
 import {
@@ -31,7 +34,6 @@ const RolesPage = () => {
   const { data, isLoading, refetch } = useGetRolesQuery();
 
   const roles = data?.data ?? [];
-  console.log(data);
   const [createRole, { isLoading: creating }] = useCreateRoleMutation();
   const [updateRole, { isLoading: updating }] = useUpdateRoleMutation();
   const [deleteRole] = useDeleteRoleMutation();
@@ -60,7 +62,9 @@ const RolesPage = () => {
       }
       setDialogOpen(false);
     } catch (e) {
-      toast.error(editingRole ? "Failed to update role" : "Failed to create role");
+      toast.error(
+        getErrorMessage(e) || (editingRole ? "Failed to update role" : "Failed to create role"),
+      );
     }
   };
 
@@ -71,7 +75,7 @@ const RolesPage = () => {
       toast.success("Role deleted successfully");
       refetch();
     } catch (e) {
-      toast.error("Failed to delete role");
+      toast.error(getErrorMessage(e) || "Failed to delete role");
     }
   };
 
@@ -85,13 +89,7 @@ const RolesPage = () => {
     {
       key: "system",
       header: "System Role",
-      render: (r) => (
-        <span
-          className={`rounded-full px-2 py-1 text-xs ${r.isSystem ? "bg-blue-500/10 text-blue-600" : "bg-gray-500/10 text-gray-600"}`}
-        >
-          {r.isSystem ? "Yes" : "No"}
-        </span>
-      ),
+      render: (r) => <StatusBadge status={r.isSystem} activeLabel="Yes" inactiveLabel="No" />,
     },
     {
       key: "actions",
@@ -114,15 +112,15 @@ const RolesPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-semibold">Roles</h2>
-          <p className="text-sm text-muted-foreground">Manage user roles and permissions.</p>
-        </div>
-        <RoleBasedGuard roles={["Admin"]}>
-          <Button onClick={openCreate}>Add Role</Button>
-        </RoleBasedGuard>
-      </div>
+      <PageHeader
+        title="Roles"
+        description="Manage user roles and permissions."
+        action={
+          <PermissionGuard permissions={["role.create"]}>
+            <Button onClick={openCreate}>Add Role</Button>
+          </PermissionGuard>
+        }
+      />
 
       <Card>
         <CardContent className="p-0">

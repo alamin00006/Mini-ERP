@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Pencil, Power, PowerOff, UserPlus } from "lucide-react";
+import { Pencil, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,11 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { DataTable, type Column } from "@/components/shared/DataTable";
-import { RoleBasedGuard } from "@/components/shared/RoleBasedGuard";
+import { PermissionGuard } from "@/components/shared/PermissionGuard";
+import { PageHeader } from "@/components/shared/PageHeader";
+import { StatusBadge } from "@/components/shared/StatusBadge";
+import { RoleBadge } from "@/components/shared/RoleBadge";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 import {
   useGetUsersQuery,
@@ -86,8 +90,10 @@ const UsersPage = () => {
       }
 
       setDialogOpen(false);
-    } catch {
-      toast.error(editingUser ? "Failed to update user" : "Failed to create user");
+    } catch (e) {
+      toast.error(
+        getErrorMessage(e) || (editingUser ? "Failed to update user" : "Failed to create user"),
+      );
     }
   };
 
@@ -96,8 +102,8 @@ const UsersPage = () => {
       await toggleUserStatus(id).unwrap();
       toast.success("User status updated successfully");
       refetch();
-    } catch {
-      toast.error("Failed to update user status");
+    } catch (e) {
+      toast.error(getErrorMessage(e) || "Failed to update user status");
     }
   };
 
@@ -115,27 +121,12 @@ const UsersPage = () => {
     {
       key: "role",
       header: "Role",
-      render: (u) => (
-        <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium capitalize text-primary">
-          {u.role}
-        </span>
-      ),
+      render: (u) => <RoleBadge role={u.role} />,
     },
     {
       key: "status",
       header: "Status",
-      render: (u) => (
-        <span
-          className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${
-            u.isActive ? "bg-emerald-500/10 text-emerald-600" : "bg-slate-500/10 text-slate-600"
-          }`}
-        >
-          <span
-            className={`h-1.5 w-1.5 rounded-full ${u.isActive ? "bg-emerald-500" : "bg-slate-400"}`}
-          />
-          {u.isActive ? "Active" : "Inactive"}
-        </span>
-      ),
+      render: (u) => <StatusBadge status={u.isActive} />,
     },
     {
       key: "actions",
@@ -177,19 +168,18 @@ const UsersPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-2xl font-semibold tracking-tight">Users</h2>
-          <p className="text-sm text-muted-foreground">Manage system users and their roles.</p>
-        </div>
-
-        <RoleBasedGuard roles={["Admin"]}>
-          <Button onClick={openCreate}>
-            <UserPlus className="mr-2 h-4 w-4" />
-            Add User
-          </Button>
-        </RoleBasedGuard>
-      </div>
+      <PageHeader
+        title="Users"
+        description="Manage system users and their roles."
+        action={
+          <PermissionGuard permissions={["user.create"]}>
+            <Button onClick={openCreate}>
+              <UserPlus className="mr-2 h-4 w-4" />
+              Add User
+            </Button>
+          </PermissionGuard>
+        }
+      />
 
       <Card>
         <CardContent className="p-0">

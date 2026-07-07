@@ -12,7 +12,10 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { DataTable, type Column } from "@/components/shared/DataTable";
-import { RoleBasedGuard } from "@/components/shared/RoleBasedGuard";
+import { PermissionGuard } from "@/components/shared/PermissionGuard";
+import { PageHeader } from "@/components/shared/PageHeader";
+import { StatusBadge } from "@/components/shared/StatusBadge";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 // Update role references to match backend (capitalized)
 import {
@@ -72,7 +75,8 @@ export default function PermissionsPage() {
       setDialogOpen(false);
     } catch (e) {
       toast.error(
-        editingPermission ? "Failed to update permission" : "Failed to create permission",
+        getErrorMessage(e) ||
+          (editingPermission ? "Failed to update permission" : "Failed to create permission"),
       );
     }
   };
@@ -84,7 +88,7 @@ export default function PermissionsPage() {
       toast.success("Permission deleted successfully");
       refetch();
     } catch (e) {
-      toast.error("Failed to delete permission");
+      toast.error(getErrorMessage(e) || "Failed to delete permission");
     }
   };
 
@@ -104,13 +108,7 @@ export default function PermissionsPage() {
     {
       key: "system",
       header: "System",
-      render: (p) => (
-        <span
-          className={`rounded-full px-2 py-1 text-xs ${p.isSystem ? "bg-blue-500/10 text-blue-600" : "bg-gray-500/10 text-gray-600"}`}
-        >
-          {p.isSystem ? "Yes" : "No"}
-        </span>
-      ),
+      render: (p) => <StatusBadge status={p.isSystem} activeLabel="Yes" inactiveLabel="No" />,
     },
     {
       key: "actions",
@@ -133,17 +131,15 @@ export default function PermissionsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-semibold">Permissions</h2>
-          <p className="text-sm text-muted-foreground">
-            Manage system permissions and access control.
-          </p>
-        </div>
-        <RoleBasedGuard roles={["Admin"]}>
-          <Button onClick={openCreate}>Add Permission</Button>
-        </RoleBasedGuard>
-      </div>
+      <PageHeader
+        title="Permissions"
+        description="Manage system permissions and access control."
+        action={
+          <PermissionGuard permissions={["permission.create"]}>
+            <Button onClick={openCreate}>Add Permission</Button>
+          </PermissionGuard>
+        }
+      />
 
       <Card>
         <CardContent className="p-0">

@@ -13,7 +13,7 @@ import RolePermission from '../rolePermission/rolePermission.model'
  */
 type TLoginResponse = {
   accessToken: string
-  refreshToken?: string
+  refreshToken: string
   user: {
     userId: string
     email: string
@@ -74,8 +74,19 @@ const loginUser = async (payload: {
 
   const accessToken = jwtHelpers.generateToken(tokenPayload)
 
+  // Generate refresh token
+  const refreshToken = jwtHelpers.generateRefreshToken({
+    userId: user._id.toString(),
+  })
+
+  // Store refresh token in database
+  await User.findByIdAndUpdate(user._id, {
+    refreshToken,
+  })
+
   return {
     accessToken,
+    refreshToken,
     user: {
       userId: user._id.toString(),
       email: user.email,
@@ -86,6 +97,92 @@ const loginUser = async (payload: {
   }
 }
 
+/**
+ * Refreshes access token using refresh token
+ * @param refreshToken - The refresh token
+ * @returns Promise<TLoginResponse> - New access token and refresh token with user information
+ */
+const refreshAccessToken = async (
+  refreshToken: string,
+): Promise<TLoginResponse> => {
+  try {
+    // Verify refresh token
+    const decoded = jwtHelpers.verifyRefreshToken<{ userId: string }>(
+      refreshToken,
+    )
+
+    // Check if refresh token exists in database
+    const user = await User.findOne({ refreshToken })
+    if (!user) {
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid refresh token')
+    }
+
+    // Get user role and permissions
+    const userRole = await UserRole.findOne({ user: user._id }).populate('role')
+    if (!userRole) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'User role not found')
+    }
+
+    const role = userRole.role as any
+    const rolePermissions = await RolePermission.find({
+      role: role._id,
+    }).populate('permission')
+
+    const permissions = rolePermissions
+      .filter((rp: any) => rp.permission && rp.allowed)
+      .map((rp: any) => (rp.permission as any).key)
+
+    const tokenPayload = {
+      userId: user._id.toString(),
+      roleId: role._id.toString(),
+      roleName: role.name,
+      permissions,
+    }
+
+    // Generate new access token
+    const newAccessToken = jwtHelpers.generateToken(tokenPayload)
+
+    // Generate new refresh token
+    const newRefreshToken = jwtHelpers.generateRefreshToken({
+      userId: user._id.toString(),
+    })
+
+    // Update refresh token in database
+    await User.findByIdAndUpdate(user._id, {
+      refreshToken: newRefreshToken,
+    })
+
+    return {
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+      user: {
+        userId: user._id.toString(),
+        email: user.email,
+        name: user.name,
+        role: role.name,
+        permissions,
+      },
+    }
+  } catch (error) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      'Invalid or expired refresh token',
+    )
+  }
+}
+
+/**
+ * Logs out user by clearing refresh token
+ * @param userId - User ID to clear refresh token for
+ */
+const logoutUser = async (userId: string): Promise<void> => {
+  await User.findByIdAndUpdate(userId, {
+    refreshToken: undefined,
+  })
+}
+
 export const AuthService = {
   loginUser,
+  refreshAccessToken,
+  logoutUser,
 }

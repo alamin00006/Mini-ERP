@@ -1,5 +1,5 @@
 import { baseApi } from "./baseApi";
-import type { ApiEnvelope, Permission, PermissionListResponse } from "@/types";
+import type { Permission, PermissionListResponse } from "@/types";
 
 export const permissionsApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
@@ -36,7 +36,7 @@ export const permissionsApi = baseApi.injectEndpoints({
       }
     >({
       query: ({ id, data }) => ({
-        url: `/api/permissions/${id}`,
+        url: `/permissions/${id}`,
         method: "PUT",
         data,
       }),
@@ -44,7 +44,7 @@ export const permissionsApi = baseApi.injectEndpoints({
     }),
     deletePermission: build.mutation<void, string | number>({
       query: (id) => ({
-        url: `/api/permissions/${id}`,
+        url: `/permissions/${id}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Permissions"],

@@ -32,6 +32,9 @@ import {
 
 import { useCreateSaleMutation, useGetProductsQuery, useGetNotificationsQuery } from "@/redux";
 import type { Product } from "@/types";
+import { formatCurrency } from "@/utils/formatCurrency";
+import { PageHeader } from "@/components/shared/PageHeader";
+import { SummaryCard } from "@/components/shared/SummaryCard";
 
 interface LineItem {
   productId: string;
@@ -39,8 +42,6 @@ interface LineItem {
 }
 
 const getProductId = (product: Product) => String(product._id);
-
-const formatCurrency = (value: number) => `$${value.toFixed(2)}`;
 
 const toQuantityNumber = (value: string) => Number(value) || 0;
 
@@ -211,42 +212,24 @@ const CreateSalePage = () => {
 
   return (
     <div className="mx-auto max-w-7xl space-y-6">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <div className="inline-flex items-center gap-2 rounded-full border bg-background px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm">
-            <ReceiptText className="h-3.5 w-3.5" />
-            Sales Management
-          </div>
+      <PageHeader
+        title="Create Sale"
+        description="Select products, enter quantities, and record a new inventory sale."
+        badge={{
+          icon: <ReceiptText className="h-3.5 w-3.5" />,
+          label: "Sales Management",
+        }}
+      />
 
-          <h2 className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">Create Sale</h2>
-
-          <p className="mt-1 text-sm text-muted-foreground">
-            Select products, enter quantities, and record a new inventory sale.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          <Card className="min-w-[140px] border-dashed">
-            <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground">Selected</p>
-              <p className="mt-1 text-xl font-semibold">{selectedProductCount}</p>
-            </CardContent>
-          </Card>
-
-          <Card className="min-w-[140px] border-dashed">
-            <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground">Units</p>
-              <p className="mt-1 text-xl font-semibold">{totalQuantity}</p>
-            </CardContent>
-          </Card>
-
-          <Card className="col-span-2 min-w-[160px] border-dashed sm:col-span-1">
-            <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground">Total</p>
-              <p className="mt-1 text-xl font-semibold">{formatCurrency(grandTotal)}</p>
-            </CardContent>
-          </Card>
-        </div>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <SummaryCard label="Selected" value={selectedProductCount} tone="primary" />
+        <SummaryCard label="Units" value={totalQuantity} tone="primary" />
+        <SummaryCard
+          label="Total"
+          value={formatCurrency(grandTotal)}
+          tone="success"
+          className="col-span-2 sm:col-span-1"
+        />
       </div>
 
       <form onSubmit={onSubmit}>

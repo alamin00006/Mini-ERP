@@ -1,23 +1,8 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import {
-  LayoutDashboard,
-  Package,
-  ShoppingCart,
-  Users,
-  Shield,
-  KeyRound,
-  LogOut,
-  Menu,
-  PanelLeftClose,
-  PanelLeftOpen,
-  ChevronRight,
-  Folder,
-  Bell,
-  ClipboardList,
-} from "lucide-react";
+import { LogOut, Menu, PanelLeftClose, PanelLeftOpen, ChevronRight } from "lucide-react";
 import { NotificationDropdown } from "@/components/shared/NotificationDropdown";
-import { RoleBasedGuard } from "@/components/shared/RoleBasedGuard";
+import { PermissionGuard } from "@/components/shared/PermissionGuard";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -34,30 +19,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { logout } from "@/redux/slices/authSlice";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-
-interface NavItem {
-  to: string;
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
-  roles?: string[];
-}
-
-const NAV_ITEMS: NavItem[] = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["Admin"] },
-  { to: "/products", label: "Products", icon: Package, roles: ["Admin", "Manager", "Employee"] },
-  { to: "/categories", label: "Categories", icon: Folder, roles: ["Admin"] },
-  {
-    to: "/sales/create",
-    label: "Create Sale",
-    icon: ShoppingCart,
-    roles: ["Admin", "Employee", "Manager"],
-  },
-  { to: "/sales/list", label: "Sales List", icon: ClipboardList, roles: ["Admin"] },
-  { to: "/users", label: "Users", icon: Users, roles: ["Admin"] },
-  { to: "/roles", label: "Roles", icon: Shield, roles: ["Admin"] },
-
-  { to: "/notifications", label: "Notifications", icon: Bell, roles: ["Admin"] },
-];
+import { getUserInitials } from "@/utils/user";
+import { NAV_ITEMS, type NavItem } from "@/layouts/navigation";
 
 const STORAGE_KEY = "erp:sidebar:collapsed";
 
@@ -70,19 +33,12 @@ const usePageTitle = (pathname: string) => {
   return match?.label ?? "Overview";
 };
 
-const useAuthRole = () => {
-  if (typeof window === "undefined") return null;
-  try {
-    const userRaw = window.localStorage.getItem("erp_user");
-    if (!userRaw) return null;
-    const user = JSON.parse(userRaw);
-    return user?.role ?? null;
-  } catch {
-    return null;
-  }
+const useAuthPermissions = () => {
+  const { user } = useAuth();
+  return user?.permissions ?? [];
 };
 
-export function AppLayout({ children }: { children: ReactNode }) {
+const AppLayout = ({ children }: { children: ReactNode }) => {
   const [collapsed, setCollapsed] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
     return window.localStorage.getItem(STORAGE_KEY) === "1";
@@ -92,9 +48,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
+  const userPermissions = useAuthPermissions();
   const pathname = location.pathname;
   const pageTitle = usePageTitle(pathname);
-  const userRole = useAuthRole();
 
   useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, collapsed ? "1" : "0");
@@ -108,17 +64,14 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
   const isActive = (to: string) => {
     if (to === "/dashboard") return pathname === to;
-    // Exact match always returns true
     if (pathname === to) return true;
-    // For prefix matches, check if this is the most specific (longest) matching route
     if (to !== "/" && pathname.startsWith(to + "/")) {
-      // Find all routes that match the current pathname
       const matchingRoutes = NAV_ITEMS.filter((item) => {
         if (pathname === item.to) return true;
         if (item.to !== "/" && pathname.startsWith(item.to + "/")) return true;
         return false;
       });
-      // Get the longest matching route (most specific)
+
       const longestMatch = matchingRoutes.reduce(
         (longest, item) => (item.to.length > longest.to.length ? item : longest),
         matchingRoutes[0],
@@ -129,12 +82,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
     return false;
   };
 
-  const initials = (user?.name ?? "U")
-    .split(" ")
-    .map((s) => s[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
+  const initials = getUserInitials(user?.name ?? "U");
 
   return (
     <TooltipProvider delayDuration={150}>
@@ -151,7 +99,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             isActive={isActive}
             onNavigate={() => {}}
             onLogout={handleLogout}
-            userRole={userRole}
+            userPermissions={userPermissions}
           />
         </aside>
 
@@ -167,7 +115,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 setMobileOpen(false);
                 handleLogout();
               }}
-              userRole={userRole}
+              userPermissions={userPermissions}
             />
           </SheetContent>
         </Sheet>
@@ -216,9 +164,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
               <h1 className="truncate text-base font-semibold sm:hidden">{pageTitle}</h1>
             </div>
 
-            <RoleBasedGuard roles={["Admin"]}>
+            <PermissionGuard permissions={["notification.read"]}>
               <NotificationDropdown />
-            </RoleBasedGuard>
+            </PermissionGuard>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -264,20 +212,20 @@ export function AppLayout({ children }: { children: ReactNode }) {
       </div>
     </TooltipProvider>
   );
-}
+};
 
 const SidebarInner = ({
   collapsed,
   isActive,
   onNavigate,
   onLogout,
-  userRole,
+  userPermissions,
 }: {
   collapsed: boolean;
   isActive: (to: string) => boolean;
   onNavigate: () => void;
   onLogout: () => void;
-  userRole: string | null;
+  userPermissions: string[];
 }) => {
   return (
     <>
@@ -303,8 +251,12 @@ const SidebarInner = ({
             Workspace
           </p>
         )}
-        {NAV_ITEMS.map(({ to, label, icon: Icon, roles }) => {
-          if (roles && userRole && !roles.includes(userRole)) return null;
+        {NAV_ITEMS.map(({ to, label, icon: Icon, permissions }) => {
+          if (
+            permissions &&
+            !permissions.some((permission) => userPermissions.includes(permission))
+          )
+            return null;
           const active = isActive(to);
           const link = (
             <Link
@@ -363,3 +315,5 @@ const SidebarInner = ({
     </>
   );
 };
+
+export default AppLayout;

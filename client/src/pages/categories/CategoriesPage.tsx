@@ -12,22 +12,28 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { DataTable, type Column } from "@/components/shared/DataTable";
-import { RoleBasedGuard } from "@/components/shared/RoleBasedGuard";
+import { PermissionGuard } from "@/components/shared/PermissionGuard";
+import { PageHeader } from "@/components/shared/PageHeader";
+import { StatusBadge } from "@/components/shared/StatusBadge";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 import {
   useGetCategoriesQuery,
   useCreateCategoryMutation,
   useUpdateCategoryMutation,
 } from "@/redux";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil } from "lucide-react";
 import type { Category } from "@/types";
+import { useAuth } from "@/hooks/useAuth";
 
 const CategoriesPage = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [formData, setFormData] = useState({ name: "", description: "", isActive: true });
 
-  const { data, isLoading, refetch } = useGetCategoriesQuery();
+  const { user } = useAuth();
+
+  const { data, isLoading } = useGetCategoriesQuery();
 
   const categories = data?.data ?? [];
 
@@ -65,7 +71,10 @@ const CategoriesPage = () => {
       }
       setDialogOpen(false);
     } catch (e) {
-      toast.error(editingCategory ? "Failed to update category" : "Failed to create category");
+      toast.error(
+        getErrorMessage(e) ||
+          (editingCategory ? "Failed to update category" : "Failed to create category"),
+      );
     }
   };
 
@@ -79,45 +88,49 @@ const CategoriesPage = () => {
     {
       key: "isActive",
       header: "Status",
-      render: (c) => (
-        <span
-          className={`rounded-full px-2 py-1 text-xs ${c.isActive ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-600"}`}
-        >
-          {c.isActive ? "Active" : "Inactive"}
-        </span>
-      ),
+      render: (c) => <StatusBadge status={c.isActive} />,
     },
-    {
+  ];
+
+  // Only show actions column if user has update or delete permission
+  if (
+    user?.permissions?.some((permission) =>
+      ["category.update", "category.delete"].includes(permission),
+    )
+  ) {
+    columns.push({
       key: "actions",
       header: "Actions",
       className: "text-right",
       render: (c) => (
         <div className="flex justify-end gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => openEdit(c)}
-            className="h-8 w-8 rounded-lg text-muted-foreground hover:bg-primary/10 hover:text-primary"
-            aria-label="Edit category"
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
+          <PermissionGuard permissions={["category.update"]}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => openEdit(c)}
+              className="h-8 w-8 rounded-lg text-muted-foreground hover:bg-primary/10 hover:text-primary"
+              aria-label="Edit category"
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+          </PermissionGuard>
         </div>
       ),
-    },
-  ];
+    });
+  }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-semibold">Categories</h2>
-          <p className="text-sm text-muted-foreground">Manage product categories.</p>
-        </div>
-        <RoleBasedGuard roles={["Admin", "Manager"]}>
-          <Button onClick={openCreate}>Add Category</Button>
-        </RoleBasedGuard>
-      </div>
+      <PageHeader
+        title="Categories"
+        description="Manage product categories."
+        action={
+          <PermissionGuard permissions={["category.create"]}>
+            <Button onClick={openCreate}>Add Category</Button>
+          </PermissionGuard>
+        }
+      />
 
       <Card>
         <CardContent className="p-0">

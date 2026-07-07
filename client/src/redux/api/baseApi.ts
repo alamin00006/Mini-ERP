@@ -1,20 +1,12 @@
 import { axiosBaseQuery } from "./axiosBaseQuery";
-import { getBaseUrl } from "@/config/envConfig";
+import { getBaseUrl } from "@/config/envConfg";
 import { createApi } from "@reduxjs/toolkit/query/react";
 
 type TagType =
   | "user"
   | "auth"
-  | "brand"
-  | "branch"
   | "product"
-  | "order"
   | "role"
-  | "employee"
-  | "department"
-  | "service_order"
-  | "company_Info"
-  | "client_product"
   | "Dashboard"
   | "Sales"
   | "Users"
@@ -29,16 +21,8 @@ export const baseApi = createApi({
   tagTypes: [
     "user",
     "auth",
-    "brand",
-    "branch",
     "product",
-    "order",
     "role",
-    "employee",
-    "department",
-    "service_order",
-    "company_Info",
-    "client_product",
     "Dashboard",
     "Sales",
     "Users",

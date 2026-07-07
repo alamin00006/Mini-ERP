@@ -10,6 +10,10 @@ interface IJwtPayload {
   permissions: string[]
 }
 
+interface IRefreshTokenPayload {
+  userId: string
+}
+
 const generateToken = (payload: IJwtPayload): string => {
   try {
     if (!config.jwt.secret || !config.jwt.expires_in) {
@@ -36,6 +40,32 @@ const generateToken = (payload: IJwtPayload): string => {
   }
 }
 
+const generateRefreshToken = (payload: IRefreshTokenPayload): string => {
+  try {
+    if (!config.jwt.refresh_secret || !config.jwt.refresh_expires_in) {
+      throw new ApiError(
+        httpStatus.INTERNAL_SERVER_ERROR,
+        'Refresh token configuration is missing',
+      )
+    }
+
+    const secret: Secret = config.jwt.refresh_secret
+
+    const options: SignOptions = {
+      expiresIn: config.jwt.refresh_expires_in as SignOptions['expiresIn'],
+    }
+
+    return jwt.sign(payload, secret, options)
+  } catch (error) {
+    throw new ApiError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      `Failed to generate refresh token: ${
+        error instanceof Error ? error.message : 'Unknown error'
+      }`,
+    )
+  }
+}
+
 const verifyToken = <T>(token: string): T => {
   try {
     if (!config.jwt.secret) {
@@ -48,7 +78,27 @@ const verifyToken = <T>(token: string): T => {
   }
 }
 
+const verifyRefreshToken = <T>(token: string): T => {
+  try {
+    if (!config.jwt.refresh_secret) {
+      throw new ApiError(
+        httpStatus.INTERNAL_SERVER_ERROR,
+        'Refresh token secret missing',
+      )
+    }
+
+    return jwt.verify(token, config.jwt.refresh_secret) as T
+  } catch {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      'Invalid or expired refresh token',
+    )
+  }
+}
+
 export const jwtHelpers = {
   generateToken,
+  generateRefreshToken,
   verifyToken,
+  verifyRefreshToken,
 }

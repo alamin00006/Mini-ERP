@@ -1,5 +1,5 @@
 import { baseApi } from "./baseApi";
-import type { SalePayload } from "@/types";
+import type { SalePayload, SalesListResponse } from "@/types";
 
 export const salesApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
@@ -11,7 +11,7 @@ export const salesApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Sales", "Dashboard"],
     }),
-    getSales: build.query<any, { page?: number; limit?: number }>({
+    getSales: build.query<SalesListResponse, { page?: number; limit?: number }>({
       query: (params) => ({
         url: "/sales",
         method: "GET",

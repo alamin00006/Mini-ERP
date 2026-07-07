@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import { useGetNotificationsQuery, useMarkAsReadMutation, useMarkAllAsReadMutation } from "@/redux";
-import { useSocket } from "@/hooks/useSocket";
 import { useAuth } from "@/hooks/useAuth";
 import type { Notification } from "@/types";
 import { Bell, Calendar, MessageSquare, TrendingUp, Check, CheckCheck } from "lucide-react";
@@ -17,31 +16,23 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { RoleBasedGuard } from "@/components/shared/RoleBasedGuard";
-
-const formatCurrency = (value: number) => `$${value.toFixed(2)}`;
-
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return new Intl.DateTimeFormat("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
-};
+import { SummaryCard } from "@/components/shared/SummaryCard";
+import { PageHeader } from "@/components/shared/PageHeader";
+import { formatDate } from "@/utils/formatDate";
 
 const NotificationsPage = () => {
   const { hasRole } = useAuth();
   const { data: notificationsData, isLoading } = useGetNotificationsQuery();
-  const { notifications: socketNotifications } = useSocket();
   const [markAsRead] = useMarkAsReadMutation();
   const [markAllAsRead] = useMarkAllAsReadMutation();
 
-  const notifications = Array.isArray(notificationsData?.data) ? notificationsData.data : [];
+  const notifications = useMemo(() => {
+    return Array.isArray(notificationsData?.data) ? notificationsData.data : [];
+  }, [notificationsData]);
 
-  if (!hasRole(["Admin"])) {
+  const hasAccess = useMemo(() => hasRole(["Admin"]), [hasRole]);
+
+  if (!hasAccess) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="text-center">
@@ -82,65 +73,34 @@ const NotificationsPage = () => {
 
   return (
     <div className="mx-auto max-w-7xl space-y-6">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <div className="inline-flex items-center gap-2 rounded-full border bg-background px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm">
-            <Bell className="h-3.5 w-3.5" />
-            Notifications
-          </div>
-
-          <h2 className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">
-            Notification History
-          </h2>
-
-          <p className="mt-1 text-sm text-muted-foreground">
-            View all sale notifications and updates in one place.
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title="Notification History"
+        description="View all sale notifications and updates in one place."
+        badge={{
+          icon: <Bell className="h-3.5 w-3.5" />,
+          label: "Notifications",
+        }}
+      />
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <Card className="border-dashed">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground">Total Notifications</p>
-                <p className="mt-1 text-2xl font-semibold">{stats.total}</p>
-              </div>
-              <div className="rounded-full bg-blue-500/10 p-3">
-                <Bell className="h-5 w-5 text-blue-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-dashed">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground">Unread</p>
-                <p className="mt-1 text-2xl font-semibold">{stats.unread}</p>
-              </div>
-              <div className="rounded-full bg-amber-500/10 p-3">
-                <MessageSquare className="h-5 w-5 text-amber-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-dashed">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground">Read</p>
-                <p className="mt-1 text-2xl font-semibold">{stats.read}</p>
-              </div>
-              <div className="rounded-full bg-emerald-500/10 p-3">
-                <TrendingUp className="h-5 w-5 text-emerald-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <SummaryCard
+          label="Total Notifications"
+          value={stats.total}
+          icon={<Bell className="h-5 w-5 text-blue-600" />}
+          tone="primary"
+        />
+        <SummaryCard
+          label="Unread"
+          value={stats.unread}
+          icon={<MessageSquare className="h-5 w-5 text-amber-600" />}
+          tone="warning"
+        />
+        <SummaryCard
+          label="Read"
+          value={stats.read}
+          icon={<TrendingUp className="h-5 w-5 text-emerald-600" />}
+          tone="success"
+        />
       </div>
 
       <Card className="shadow-sm">

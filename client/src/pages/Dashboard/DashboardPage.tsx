@@ -11,12 +11,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DataTable, type Column } from "@/components/shared/DataTable";
+import { SummaryCard } from "@/components/shared/SummaryCard";
+import { PageHeader } from "@/components/shared/PageHeader";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { useGetStatsQuery } from "@/redux";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import type { Product } from "@/types";
 import { cn } from "@/lib/utils";
-import StatCard from "./StatCard";
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -73,53 +75,51 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Dashboard</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Real-time overview of your inventory and sales performance.
-          </p>
-        </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => refetch()}
-          disabled={isFetching}
-          className="shrink-0"
-        >
-          <RefreshCw className={cn("mr-2 h-4 w-4", isFetching && "animate-spin")} />
-          Refresh
-        </Button>
-      </div>
+      <PageHeader
+        title="Dashboard"
+        description="Real-time overview of your inventory and sales performance."
+        action={
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="shrink-0"
+          >
+            <RefreshCw className={cn("mr-2 h-4 w-4", isFetching && "animate-spin")} />
+            Refresh
+          </Button>
+        }
+      />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
+        <SummaryCard
           label="Total Products"
-          value={dashboardData?.totalProducts}
+          value={dashboardData?.totalProducts || 0}
           icon={<Package className="h-5 w-5" />}
           loading={isLoading}
           tone="primary"
           hint="Items in catalogue"
         />
-        <StatCard
+        <SummaryCard
           label="Total Sales"
-          value={dashboardData?.totalSales}
+          value={dashboardData?.totalSales || 0}
           icon={<ShoppingCart className="h-5 w-5" />}
           loading={isLoading}
           tone="success"
           hint="All-time orders"
         />
-        <StatCard
+        <SummaryCard
           label="Total Sale Amount"
-          value={dashboardData?.totalSaleAmount}
+          value={dashboardData?.totalSaleAmount || 0}
           icon={<DollarSign className="h-5 w-5" />}
           loading={isLoading}
           tone="success"
           hint="Total revenue"
         />
-        <StatCard
+        <SummaryCard
           label="Low Stock Items"
-          value={dashboardData?.lowStockCount}
+          value={dashboardData?.lowStockCount || 0}
           icon={<AlertTriangle className="h-5 w-5" />}
           loading={isLoading}
           tone="danger"
@@ -161,19 +161,11 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         ) : !isLoading && (dashboardData?.lowStockProducts?.length ?? 0) === 0 ? (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center gap-3 py-14 text-center">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                <PackageCheck className="h-6 w-6" />
-              </div>
-              <div>
-                <p className="font-medium">All stocked up</p>
-                <p className="text-sm text-muted-foreground">
-                  No products currently below the low-stock threshold.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <EmptyState
+            icon={<PackageCheck className="h-14 w-14 text-emerald-600" />}
+            title="All stocked up"
+            description="No products currently below the low-stock threshold."
+          />
         ) : (
           <DataTable
             columns={columns}

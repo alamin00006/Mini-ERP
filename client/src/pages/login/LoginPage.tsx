@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,12 +12,7 @@ import { useAppDispatch } from "@/redux";
 import { setCredentials } from "@/redux/slices/authSlice";
 import { useAuth } from "@/hooks/useAuth";
 import { Eye, EyeOff } from "lucide-react";
-
-const schema = z.object({
-  email: z.string().trim().email("Enter a valid email"),
-  password: z.string().min(1, "Password is required"),
-});
-type Values = z.infer<typeof schema>;
+import { loginFormValues, loginSchema } from "@/schemas/loginSchema";
 
 export default function LoginPage() {
   const dispatch = useAppDispatch();
@@ -31,9 +25,8 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
-  } = useForm<Values>({ resolver: zodResolver(schema) });
+  } = useForm<loginFormValues>({ resolver: zodResolver(loginSchema) });
 
   useEffect(() => {
     if (hydrated && isAuthenticated) navigate("/dashboard", { replace: true });
@@ -50,14 +43,15 @@ export default function LoginPage() {
         setCredentials({
           token: result.data.accessToken,
           user: result.data.user,
-          permissions: [],
+          permissions: result.data.user.permissions || [],
         }),
       );
       toast.success(`Welcome, ${result.data.user.name}`);
 
       navigate("/dashboard", { replace: true });
-    } catch (error: any) {
-      setError(error?.data?.message || "An error occurred during login. Please try again.");
+    } catch (error) {
+      const err = error as { data?: { message?: string } } | undefined;
+      setError(err?.data?.message || "An error occurred during login. Please try again.");
     } finally {
       setSubmitting(false);
     }

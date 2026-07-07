@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import { AppLayout } from "@/components/layout/AppLayout";
+import AppLayout from "@/layouts/AppLayout";
 import { ProtectedRoute } from "@/components/shared/ProtectedRoute";
-import { RoleBasedGuard } from "@/components/shared/RoleBasedGuard";
+import { PermissionGuard } from "@/components/shared/PermissionGuard";
 import LoginPage from "@/pages/login/LoginPage";
 import DashboardPage from "@/pages/Dashboard/DashboardPage";
 import ProductsPage from "@/pages/products/ProductsPage";
@@ -116,9 +116,9 @@ export const router = createBrowserRouter([
     path: "/notifications",
     element: (
       <AuthenticatedLayout>
-        <RoleBasedGuard roles={["Admin"]}>
+        <PermissionGuard permissions={["notification.read"]}>
           <NotificationsPage />
-        </RoleBasedGuard>
+        </PermissionGuard>
       </AuthenticatedLayout>
     ),
   },

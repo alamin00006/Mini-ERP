@@ -10,7 +10,13 @@ export const authApi = baseApi.injectEndpoints({
         data: credentials,
       }),
     }),
+    refreshToken: build.mutation<{ accessToken: string }, void>({
+      query: () => ({
+        url: "/auth/refresh-token",
+        method: "POST",
+      }),
+    }),
   }),
 });
 
-export const { useLoginMutation } = authApi;
+export const { useLoginMutation, useRefreshTokenMutation } = authApi;

@@ -1,9 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { ProductForm } from "@/features/products/ProductForm";
+import { ProductForm } from "@/components/products/ProductForm";
 import { useCreateProductMutation } from "@/redux";
 import { useAuth } from "@/hooks/useAuth";
+import type { ProductFormValues } from "@/schemas/productSchema";
 
 const CreateProductPage = () => {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ const CreateProductPage = () => {
     }
   }, [hydrated, hasRole, navigate]);
 
-  const handleSubmit = async (values: any, image: File | null) => {
+  const handleSubmit = async (values: ProductFormValues, image: File | null) => {
     const formData = new FormData();
     formData.append("name", values.name);
     formData.append("category", values.category);

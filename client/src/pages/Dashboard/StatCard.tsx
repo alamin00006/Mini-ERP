@@ -1,11 +1,4 @@
-import {
-  Package,
-  ShoppingCart,
-  AlertTriangle,
-  PackageCheck,
-  ArrowUpRight,
-  RefreshCw,
-} from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 

@@ -3,19 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Users, Plus, Pencil, Trash2, List, Shield } from "lucide-react";
+import { Plus, Pencil, Trash2, List } from "lucide-react";
+import RoleDialog from "@/components/rbac/RoleDialog";
+import PermissionAssignmentDialog from "@/components/rbac/PermissionAssignmentDialog";
 import {
   useGetRolesQuery,
   useCreateRoleMutation,
@@ -25,19 +17,7 @@ import {
   useGetRolePermissionsQuery,
 } from "@/redux/api/rolesApi";
 import { useGetPermissionsQuery } from "@/redux/api/permissionsApi";
-import type { Role, Permission } from "@/types";
-
-type UiPermission = {
-  id: string | number;
-  key: string;
-  label: string;
-  checked: boolean;
-};
-
-type UiSection = {
-  title: string;
-  permissions: UiPermission[];
-};
+import type { Role, Permission, UiSection } from "@/types";
 
 const RBACPage = () => {
   // Roles state
@@ -58,7 +38,7 @@ const RBACPage = () => {
     data: rolePermsData,
     isLoading: rolePermsLoading,
     refetch: refetchRolePerms,
-  } = useGetRolePermissionsQuery(selectedRoleId as any, {
+  } = useGetRolePermissionsQuery(selectedRoleId as string | number, {
     skip: !selectedRoleId,
   });
 
@@ -135,8 +115,9 @@ const RBACPage = () => {
       }
       setRoleDialogOpen(false);
       refetchRoles();
-    } catch (e: any) {
-      toast.error(e?.data?.message || "Failed to save role");
+    } catch (e) {
+      const err = e as { data?: { message?: string } } | undefined;
+      toast.error(err?.data?.message || "Failed to save role");
     }
   };
 
@@ -146,8 +127,9 @@ const RBACPage = () => {
       await deleteRole(id).unwrap();
       toast.success("Role deleted successfully");
       refetchRoles();
-    } catch (e: any) {
-      toast.error(e?.data?.message || "Failed to delete role");
+    } catch (e) {
+      const err = e as { data?: { message?: string } } | undefined;
+      toast.error(err?.data?.message || "Failed to delete role");
     }
   };
 
@@ -220,38 +202,10 @@ const RBACPage = () => {
       setPermDialogOpenForRole(false);
       refetchRoles();
       refetchRolePerms();
-    } catch (e: any) {
-      toast.error(e?.data?.message || "Failed to update permissions");
+    } catch (e) {
+      const err = e as { data?: { message?: string } } | undefined;
+      toast.error(err?.data?.message || "Failed to update permissions");
     }
-  };
-
-  const totalPerms = useMemo(
-    () => sections.reduce((sum, s) => sum + s.permissions.length, 0),
-    [sections],
-  );
-
-  const totalChecked = useMemo(
-    () => sections.reduce((sum, s) => sum + s.permissions.filter((p) => p.checked).length, 0),
-    [sections],
-  );
-
-  const selectAllState: boolean | "indeterminate" =
-    totalPerms === 0
-      ? false
-      : totalChecked === 0
-        ? false
-        : totalChecked === totalPerms
-          ? true
-          : "indeterminate";
-
-  const isSectionState = (section: UiSection): boolean | "indeterminate" => {
-    const total = section.permissions.length;
-    const checked = section.permissions.filter((p) => p.checked).length;
-
-    if (total === 0) return false;
-    if (checked === 0) return false;
-    if (checked === total) return true;
-    return "indeterminate";
   };
 
   return (
@@ -372,173 +326,27 @@ const RBACPage = () => {
         </CardContent>
       </Card>
 
-      {/* Role Dialog */}
-      <Dialog open={roleDialogOpen} onOpenChange={setRoleDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{editingRole ? "Edit Role" : "Create Role"}</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleRoleSubmit} className="space-y-4">
-            <div>
-              <Label>Role Name</Label>
-              <Input
-                required
-                value={roleFormData.name}
-                onChange={(e) => setRoleFormData({ ...roleFormData, name: e.target.value })}
-                placeholder="Enter role name"
-              />
-            </div>
-            <div>
-              <Label>Description</Label>
-              <Input
-                value={roleFormData.description}
-                onChange={(e) => setRoleFormData({ ...roleFormData, description: e.target.value })}
-                placeholder="Enter description (optional)"
-              />
-            </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setRoleDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={creatingRole || updatingRole}>
-                {creatingRole || updatingRole ? "Saving..." : editingRole ? "Update" : "Create"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <RoleDialog
+        open={roleDialogOpen}
+        onOpenChange={setRoleDialogOpen}
+        editingRole={editingRole}
+        formData={roleFormData}
+        onFormDataChange={setRoleFormData}
+        onSubmit={handleRoleSubmit}
+        isLoading={creatingRole || updatingRole}
+      />
 
-      {/* Assign Permissions Dialog */}
-      <Dialog open={permDialogOpenForRole} onOpenChange={setPermDialogOpenForRole}>
-        <DialogContent className="max-w-5xl max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl">Assign Permissions</DialogTitle>
-            <p className="text-sm text-muted-foreground mt-2">
-              Select permissions to assign to this role. Use the section checkboxes to
-              select/deselect entire sections.
-            </p>
-          </DialogHeader>
-
-          {rolePermsLoading ? (
-            <div className="py-10 text-center">
-              <div className="inline-block w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4" />
-              <p className="text-sm text-muted-foreground">Loading permissions...</p>
-            </div>
-          ) : sections.length > 0 ? (
-            <div className="space-y-6 py-4">
-              {/* Select All Section */}
-              <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border">
-                <div className="flex items-center gap-3">
-                  <Checkbox
-                    id="select-all"
-                    checked={selectAllState}
-                    onCheckedChange={(val) => handleSelectAll(Boolean(val))}
-                    className="h-5 w-5"
-                  />
-                  <label htmlFor="select-all" className="text-sm font-semibold cursor-pointer">
-                    Select All Permissions
-                  </label>
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {totalChecked} of {totalPerms} selected
-                </div>
-              </div>
-
-              {/* Permission Sections Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {sections.map((section, sectionIndex) => {
-                  const sectionChecked = section.permissions.filter((p) => p.checked).length;
-                  const sectionTotal = section.permissions.length;
-
-                  return (
-                    <Card key={section.title} className="transition-all hover:shadow-md">
-                      <CardHeader className="pb-3 bg-muted/20">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Shield className="w-4 h-4 text-primary" />
-                            <CardTitle className="text-sm font-semibold">{section.title}</CardTitle>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-muted-foreground">
-                              {sectionChecked}/{sectionTotal}
-                            </span>
-                            <Checkbox
-                              id={`section-${sectionIndex}`}
-                              checked={isSectionState(section)}
-                              onCheckedChange={(val) =>
-                                handleSelectSection(sectionIndex, Boolean(val))
-                              }
-                              className="h-4 w-4"
-                            />
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="pt-4">
-                        <div className="space-y-2.5">
-                          {section.permissions.map((permission) => (
-                            <div
-                              key={permission.id}
-                              className="flex items-start gap-2.5 p-2 rounded hover:bg-muted/30 transition-colors"
-                            >
-                              <Checkbox
-                                id={`perm-${permission.id}`}
-                                checked={permission.checked}
-                                onCheckedChange={(val) =>
-                                  handlePermissionChange(sectionIndex, permission.id, Boolean(val))
-                                }
-                                className="mt-0.5 h-4 w-4"
-                              />
-                              <label
-                                htmlFor={`perm-${permission.id}`}
-                                className="text-sm cursor-pointer leading-tight flex-1"
-                              >
-                                {permission.label}
-                              </label>
-                            </div>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            </div>
-          ) : (
-            <div className="py-10 text-center text-sm text-muted-foreground">
-              No permissions available to assign.
-            </div>
-          )}
-
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setPermDialogOpenForRole(false)}
-              size="lg"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSavePermissions}
-              disabled={savingPerms || sections.length === 0}
-              size="lg"
-              className="gap-2"
-            >
-              {savingPerms ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Shield className="w-4 h-4" />
-                  Save Permissions
-                </>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <PermissionAssignmentDialog
+        open={permDialogOpenForRole}
+        onOpenChange={setPermDialogOpenForRole}
+        sections={sections}
+        loading={rolePermsLoading}
+        saving={savingPerms}
+        onSave={handleSavePermissions}
+        onSelectAll={handleSelectAll}
+        onSelectSection={handleSelectSection}
+        onPermissionChange={handlePermissionChange}
+      />
     </div>
   );
 };

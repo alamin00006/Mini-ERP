@@ -11,7 +11,9 @@ export default {
 
   jwt: {
     secret: process.env.ACCESS_TOKEN_SECRET,
+    refresh_secret: process.env.REFRESH_TOKEN_SECRET,
     expires_in: process.env.JWT_EXPIRES_IN,
+    refresh_expires_in: process.env.REFRESH_TOKEN_EXPIRES_IN,
   },
 
   cloudflare_r2: {
@@ -26,4 +28,10 @@ export default {
     'http://localhost:3000',
     'http://localhost:5173',
   ],
+
+  cookie: {
+    secure: process.env.COOKIE_SECURE === 'true',
+    httpOnly: process.env.COOKIE_HTTP_ONLY === 'true',
+    sameSite: process.env.COOKIE_SAME_SITE || 'lax',
+  },
 }

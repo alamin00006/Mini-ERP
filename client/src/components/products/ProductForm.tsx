@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { productSchema, type ProductFormValues } from "./productSchema";
+import { productSchema, type ProductFormValues } from "@/schemas/productSchema";
 import type { Product, Category } from "@/types";
 import { useGetCategoriesQuery } from "@/redux";
 
@@ -37,7 +37,7 @@ export const ProductForm = ({
   const [imageError, setImageError] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
 
-  const { data: categoriesData, isLoading: categoriesLoading } = useGetCategoriesQuery();
+  const { data: categoriesData } = useGetCategoriesQuery();
   const categories = categoriesData?.data ?? [];
 
   const form = useForm<ProductFormValues>({
@@ -52,15 +52,9 @@ export const ProductForm = ({
     formState: { errors },
   } = form;
 
-  console.log("ProductForm initial data:", initial);
-  console.log("Categories loaded:", categories);
-
   // Update form values and preview when initial data changes
   useEffect(() => {
     if (!initial || !initial._id) return;
-
-    console.log("Setting initial data:", initial);
-    console.log("Initial categoryId:", initial.categoryId);
 
     // Set basic form values
     reset({
@@ -87,30 +81,15 @@ export const ProductForm = ({
 
   // Re-set category value when categories load to ensure Select displays it
   useEffect(() => {
-    console.log(
-      "Categories changed:",
-      categories.length,
-      "Initial categoryId:",
-      initial?.categoryId,
-    );
-
     if (!initial?.categoryId || categories.length === 0) return;
 
     // Check if the category exists in the loaded categories
     const categoryExists = categories.some((cat) => cat._id === initial.categoryId);
-    console.log("Category exists in list:", categoryExists);
 
     if (categoryExists) {
-      console.log("Setting category to:", initial.categoryId);
       setValue("category", initial.categoryId, { shouldValidate: true });
     }
   }, [categories, initial?.categoryId, setValue]);
-
-  // Update preview when initial image changes
-  useEffect(() => {
-    if (initial?.image) {
-    }
-  }, [initial]);
 
   useEffect(() => {
     if (!imageFile) return;

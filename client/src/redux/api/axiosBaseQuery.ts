@@ -1,4 +1,4 @@
-import { axiosInstance } from "@/api/axiosInstance";
+import { axiosInstance } from "@/lib/axiosInstance";
 import axios, { AxiosRequestConfig } from "axios";
 
 interface AxiosBaseQueryArgs {

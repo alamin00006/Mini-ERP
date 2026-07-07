@@ -1,16 +1,17 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { ProductForm } from "@/features/products/ProductForm";
+import { ProductForm } from "@/components/products/ProductForm";
 import { useGetProductQuery, useUpdateProductMutation } from "@/redux";
 import { useAuth } from "@/hooks/useAuth";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { ProductFormValues } from "@/schemas/productSchema";
 
 export default function EditProductPage() {
   const { id = "" } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { hasRole, hydrated } = useAuth();
-  const { data, isLoading, isError, refetch } = useGetProductQuery(id);
+  const { data, isLoading, isError } = useGetProductQuery(id);
   const [updateProduct] = useUpdateProductMutation();
 
   useEffect(() => {
@@ -20,7 +21,7 @@ export default function EditProductPage() {
     }
   }, [hydrated, hasRole, navigate]);
 
-  const handleSubmit = async (values: any, image: File | null) => {
+  const handleSubmit = async (values: ProductFormValues, image: File | null) => {
     const formData = new FormData();
     formData.append("name", values.name);
     formData.append("category", values.category);

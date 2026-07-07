@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
+import type { Notification } from "@/types";
 
 const SOCKET_URL = "http://localhost:5000";
 
@@ -7,7 +8,7 @@ let socket: Socket | null = null;
 
 export const useSocket = () => {
   const [isConnected, setIsConnected] = useState(false);
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
