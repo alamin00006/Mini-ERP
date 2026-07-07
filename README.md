@@ -4,8 +4,8 @@
 
 # Live Demo
 
-- **Frontend:** https://erpclient.krishokai.xyz
-- **Backend API:** https://erp-server-krishokai.vercel.app
+- **Frontend:** https://erpclient.krishokai.xyz/login
+- **Backend API:** https://erpserver.krishokai.xyz/api/v1
 
 ---
 
