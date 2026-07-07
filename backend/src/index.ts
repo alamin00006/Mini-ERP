@@ -7,7 +7,6 @@ import { Server } from 'socket.io'
 import routes from './app/routes/index'
 import globalErrorHandler from './errors/globalErrorHandler'
 import { handleMulterError } from './app/middlewares/multer'
-
 import { databaseConnect } from './helpers/dbConnect'
 import config from './config'
 
@@ -17,7 +16,10 @@ const server = http.createServer(app)
 // ============================
 // Allowed Origins
 // ============================
-const allowedOrigins = config.allowed_origins
+const allowedOrigins = [
+  'https://erpclient.krishokai.xyz',
+  'http://localhost:5173',
+]
 
 // ============================
 // Middleware

@@ -12,7 +12,6 @@ router.post(
   AuthController.loginUser,
 )
 
-// Refresh token endpoint - no body validation needed, reads from cookie
 router.post('/refresh-token', AuthController.refreshToken)
 
 router.post('/logout', auth, AuthController.logoutUser)
