@@ -39,11 +39,4 @@ router.put(
   CategoryController.updateCategory,
 )
 
-router.patch(
-  '/:id/delete',
-  auth,
-  authorize('category.delete'),
-  CategoryController.deleteCategory,
-)
-
 export default router

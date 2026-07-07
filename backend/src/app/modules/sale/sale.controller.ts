@@ -16,9 +16,11 @@ const createSale = async (
 ): Promise<void> => {
   try {
     const userId = (req as any).user?.userId
+    const io = req.app.get('socketio')
     const result = await SaleService.createSale({
       ...req.body,
       createdBy: userId,
+      io,
     })
     sendResponse(res, {
       statusCode: httpStatus.CREATED,

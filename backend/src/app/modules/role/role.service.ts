@@ -255,10 +255,37 @@ const deactivateRole = async (id: string): Promise<TRoleResponse> => {
   }
 }
 
+/**
+ * Deletes a role by ID (hard delete)
+ * @param id - Role ID to delete
+ * @returns Promise<{ message: string }> - Success message
+ */
+const deleteRole = async (id: string): Promise<{ message: string }> => {
+  const role = await Role.findById(id)
+  if (!role) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Role not found')
+  }
+
+  if (role.isSystem) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Cannot delete system role')
+  }
+
+  // Delete associated role-permission mappings
+  await RolePermission.deleteMany({ role: id })
+
+  // Delete the role
+  await Role.findByIdAndDelete(id)
+
+  return {
+    message: 'Role deleted successfully',
+  }
+}
+
 export const RoleService = {
   createRole,
   getAllRoles,
   getRoleById,
   updateRole,
   deactivateRole,
+  deleteRole,
 }

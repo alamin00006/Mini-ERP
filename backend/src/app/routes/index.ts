@@ -7,6 +7,7 @@ import CategoryRoutes from '../modules/category/category.route'
 import ProductRoutes from '../modules/product/product.route'
 import SaleRoutes from '../modules/sale/sale.route'
 import DashboardRoutes from '../modules/dashboard/dashboard.route'
+import { notificationRoutes } from '../modules/notification/notification.route'
 
 const router = express.Router()
 
@@ -42,6 +43,10 @@ const moduleRoutes = [
   {
     path: '/dashboard',
     route: DashboardRoutes,
+  },
+  {
+    path: '/notifications',
+    route: notificationRoutes,
   },
 ]
 

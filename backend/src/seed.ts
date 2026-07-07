@@ -198,6 +198,15 @@ const defaultPermissions = [
     group: 'Dashboard',
     module: 'Dashboard',
   },
+
+  // Notification permissions
+  {
+    key: 'notification.read',
+    name: 'Read Notifications',
+    description: 'View notification history',
+    group: 'Notification',
+    module: 'Notification',
+  },
 ]
 
 const defaultRoles = [

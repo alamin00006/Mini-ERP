@@ -33,4 +33,6 @@ router.patch(
   RoleController.deactivateRole,
 )
 
+router.delete('/:id', auth, authorize('role.delete'), RoleController.deleteRole)
+
 export default router

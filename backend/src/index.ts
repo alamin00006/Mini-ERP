@@ -3,6 +3,7 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import http from 'http'
 import httpStatus from 'http-status'
+import { Server } from 'socket.io'
 import routes from './app/routes/index'
 import globalErrorHandler from './errors/globalErrorHandler'
 import { handleMulterError } from './app/middlewares/multer'
@@ -98,6 +99,31 @@ process.on('SIGTERM', () => {
       process.exit(0)
     })
   }
+})
+
+// ============================
+// Socket.IO setup
+// ============================
+const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'x-api-key', 'Authorization'],
+  },
+  transports: ['websocket', 'polling'],
+})
+
+app.set('socketio', io)
+
+io.on('connection', socket => {
+  socket.on('join_room', room => {
+    socket.join(room)
+  })
+
+  socket.on('disconnect', () => {
+    // console.log('Client disconnected')
+  })
 })
 
 // ============================

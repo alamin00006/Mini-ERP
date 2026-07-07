@@ -102,34 +102,9 @@ const updateCategory = async (
   }
 }
 
-/**
- * Deletes a category by ID (soft delete)
- * @param req - Express request object with category ID in params
- * @param res - Express response object
- * @param next - Express next middleware function for error handling
- */
-const deleteCategory = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
-  try {
-    const { id } = req.params
-    await CategoryService.deleteCategory(id)
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: 'Category deleted successfully',
-    })
-  } catch (error) {
-    next(error)
-  }
-}
-
 export const CategoryController = {
   createCategory,
   getAllCategories,
   getCategoryById,
   updateCategory,
-  deleteCategory,
 }

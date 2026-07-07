@@ -15,10 +15,10 @@ export default {
   },
 
   cloudflare_r2: {
-    access_key_id: process.env.CLOUDFLARE_R2_ACCESS_KEY_ID,
-    secret_access_key: process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY,
-    bucket_name: process.env.CLOUDFLARE_R2_BUCKET_NAME,
-    endpoint: process.env.CLOUDFLARE_R2_ENDPOINT,
-    public_url: process.env.CLOUDFLARE_R2_PUBLIC_URL,
+    access_key_id: process.env.R2_ACCESS_KEY_ID,
+    secret_access_key: process.env.R2_SECRET_ACCESS_KEY,
+    bucket_name: process.env.R2_BUCKET_NAME,
+    endpoint: process.env.R2_ENDPOINT,
+    public_url: process.env.R2_PUBLIC_URL,
   },
 }

@@ -135,23 +135,9 @@ const updateCategory = async (
   }
 }
 
-/**
- * Deletes a category by ID (soft delete)
- * @param id - Category ID to delete
- */
-const deleteCategory = async (id: string): Promise<void> => {
-  const category = await Category.findById(id)
-  if (!category) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Category not found')
-  }
-
-  await Category.findByIdAndUpdate(id, { isActive: false })
-}
-
 export const CategoryService = {
   createCategory,
   getAllCategories,
   getCategoryById,
   updateCategory,
-  deleteCategory,
 }

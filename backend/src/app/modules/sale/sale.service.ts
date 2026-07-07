@@ -3,6 +3,8 @@ import ApiError from '../../../errors/ApiError'
 import mongoose from 'mongoose'
 import Product from '../product/product.model'
 import Sale from './sale.model'
+import { NotificationService } from '../notification/notification.service'
+import { ENUM_USER_ROLE } from '../../../enums/role'
 
 /**
  * Product details in a sale
@@ -35,8 +37,9 @@ type TSaleResponse = {
 const createSale = async (payload: {
   products: { product: string; quantity: number }[]
   createdBy: string
+  io: any
 }): Promise<TSaleResponse> => {
-  const { products, createdBy } = payload
+  const { products, createdBy, io } = payload
 
   if (!products || products.length === 0) {
     throw new ApiError(
@@ -107,6 +110,16 @@ const createSale = async (payload: {
 
     await session.commitTransaction()
     session.endSession()
+
+    // Create notification for new sale
+    if (io) {
+      await NotificationService.createNotification({
+        message: `New sale created with grand total: ${grandTotal}`,
+        roles: [ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.MANAGER],
+        type: 'general',
+        io,
+      })
+    }
 
     return {
       _id: sale[0]._id.toString(),

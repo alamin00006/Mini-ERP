@@ -126,10 +126,36 @@ const deactivateRole = async (
   }
 }
 
+/**
+ * Deletes a role by ID (hard delete)
+ * @param req - Express request object with role ID in params
+ * @param res - Express response object
+ * @param next - Express next middleware function for error handling
+ */
+const deleteRole = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const { id } = req.params
+    const result = await RoleService.deleteRole(id)
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: result.message,
+      data: null,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const RoleController = {
   createRole,
   getAllRoles,
   getRoleById,
   updateRole,
   deactivateRole,
+  deleteRole,
 }
