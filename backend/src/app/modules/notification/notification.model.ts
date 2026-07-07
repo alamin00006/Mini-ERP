@@ -34,7 +34,7 @@ const notificationSchema = new Schema<INotification>(
     roles: {
       type: [String],
       enum: Object.values(ENUM_USER_ROLE),
-      default: [ENUM_USER_ROLE.COMPANY],
+      default: [ENUM_USER_ROLE.ADMIN],
     },
     type: {
       type: String,
